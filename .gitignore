@@ -3,7 +3,11 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 .kotlin
-
+.m2
+.idea
+.runtime
+.tools
+target
 ### Eclipse ###
 .apt_generated
 .classpath
