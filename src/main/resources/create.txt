@@ -1,0 +1,4294 @@
+@
+--插入客流密度
+--计算总客流量
+select sum (num) /6340 from tb_grid_hour_flow;
+update tb_selection_branch_collection_3km set pedestrian_density = num from (select tgbp.org_id,(sum(num)/(3.14*9)) as avg_grid, (sum(num)/(3.14*9))/1767984.22 as num
+from tb_grid_bank_poi_3km tgbp
+left join tb_grid_hour_flow tghf
+on
+tgbp.grid_id  = tghf.grid_id
+group by tgbp.org_id) t where t.org_id = tb_selection_branch_collection_3km.org_id ;
+
+update tb_selection_branch_collection_1km set pedestrian_density = num from (select tgbp.org_id,(sum(num)/(3.14*1)) as avg_grid, (sum(num)/(3.14*1))/1767984.22 as num
+from tb_grid_bank_poi_1km tgbp
+left join tb_grid_hour_flow tghf
+on
+tgbp.grid_id  = tghf.grid_id
+group by tgbp.org_id) t where t.org_id = tb_selection_branch_collection_1km.org_id ;
+
+update tb_selection_branch_collection_500m set pedestrian_density = num from (select tgbp.org_id,(sum(num)/(3.14*0.25)) as avg_grid, (sum(num)/(3.14*0.25))/1767984.22 as num
+from tb_grid_bank_poi_500m tgbp
+left join tb_grid_hour_flow tghf
+on
+tgbp.grid_id  = tghf.grid_id
+group by tgbp.org_id) t where t.org_id = tb_selection_branch_collection_500m.org_id ;
+
+--计算居住人口密度比
+select sum (num) /6340 from tb_grid_permanent_num where population_type ='HOME';
+update tb_selection_branch_collection_3km set resident_density = num from (select tgbp.org_id,(sum(num)/(3.14*9)) as avg_grid, (sum(num)/(3.14*9))/5257.42 as num
+from tb_grid_bank_poi_3km tgbp
+left join tb_grid_permanent_num tghf
+on
+tgbp.grid_id  = tghf.grid_id where tghf.population_type ='HOME'
+group by tgbp.org_id) t where t.org_id = tb_selection_branch_collection_3km.org_id ;
+
+update tb_selection_branch_collection_1km set resident_density = num from (select tgbp.org_id,(sum(num)/(3.14*1)) as avg_grid, (sum(num)/(3.14*1))/5257.42 as num
+from tb_grid_bank_poi_1km tgbp
+left join tb_grid_permanent_num tghf
+on
+tgbp.grid_id  = tghf.grid_id where tghf.population_type ='HOME'
+group by tgbp.org_id) t where t.org_id = tb_selection_branch_collection_1km.org_id ;
+
+update tb_selection_branch_collection_500m set resident_density = num from (select tgbp.org_id,(sum(num)/(3.14*0.25)) as avg_grid, (sum(num)/(3.14*0.25))/5257.42 as num
+from tb_grid_bank_poi_500m tgbp
+left join tb_grid_permanent_num tghf
+on
+tgbp.grid_id  = tghf.grid_id where tghf.population_type ='HOME'
+group by tgbp.org_id) t where t.org_id = tb_selection_branch_collection_500m.org_id ;
+
+
+--计算工作人口密度比
+select sum (num) /6340 from tb_grid_permanent_num where population_type ='WORK';
+update tb_selection_branch_collection_3km set working_density = num from (select tgbp.org_id,(sum(num)/(3.14*9)) as avg_grid, (sum(num)/(3.14*9))/2593.43 as num
+from tb_grid_bank_poi_3km tgbp
+left join tb_grid_permanent_num tghf
+on
+tgbp.grid_id  = tghf.grid_id where tghf.population_type ='WORK'
+group by tgbp.org_id) t where t.org_id = tb_selection_branch_collection_3km.org_id ;
+
+update tb_selection_branch_collection_1km set working_density = num from (select tgbp.org_id,(sum(num)/(3.14*1)) as avg_grid, (sum(num)/(3.14*1))/2593.43 as num
+from tb_grid_bank_poi_1km tgbp
+left join tb_grid_permanent_num tghf
+on
+tgbp.grid_id  = tghf.grid_id where tghf.population_type ='WORK'
+group by tgbp.org_id) t where t.org_id = tb_selection_branch_collection_1km.org_id ;
+
+update tb_selection_branch_collection_500m set working_density = num from (select tgbp.org_id,(sum(num)/(3.14*0.25)) as avg_grid, (sum(num)/(3.14*0.25))/2593.43 as num
+from tb_grid_bank_poi_500m tgbp
+left join tb_grid_permanent_num tghf
+on
+tgbp.grid_id  = tghf.grid_id where tghf.population_type ='WORK'
+group by tgbp.org_id) t where t.org_id = tb_selection_branch_collection_500m.org_id ;
+
+--计算工作日节假日客流比
+
+update tb_selection_branch_collection_3km set work_perdestrian_density = num from (select (t.num/t1.num) as num,t.org_id  from (select sum(num) as num,t.org_id  from tb_grid_bank_poi_3km t left join tb_grid_hour_flow t1 on t.grid_id = t1.grid_id  where t1.type = 'WROK_HOUR_FLOW' group by t.org_id ) t
+, (select sum(num) as num,t.org_id  from tb_grid_bank_poi_3km t 
+left join tb_grid_hour_flow t1 on t.grid_id = t1.grid_id  where t1.type = 'HOLIDAY_HOUR_FLOW' group by t.org_id ) t1
+where t.org_id = t1.org_id
+) t where t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+update tb_selection_branch_collection_1km set work_perdestrian_density = num from (select (t.num/t1.num) as num,t.org_id  from (select sum(num) as num,t.org_id  from tb_grid_bank_poi_1km t left join tb_grid_hour_flow t1 on t.grid_id = t1.grid_id  where t1.type = 'WROK_HOUR_FLOW' group by t.org_id ) t
+, (select sum(num) as num,t.org_id  from tb_grid_bank_poi_1km t left join tb_grid_hour_flow t1 on t.grid_id = t1.grid_id  where t1.type = 'HOLIDAY_HOUR_FLOW' group by t.org_id ) t1
+where t.org_id = t1.org_id
+) t where t.org_id = tb_selection_branch_collection_1km.org_id;
+
+
+update tb_selection_branch_collection_500m set work_perdestrian_density = num from (select (t.num/t1.num) as num,t.org_id  from (select sum(num) as num,t.org_id  from tb_grid_bank_poi_500m t left join tb_grid_hour_flow t1 on t.grid_id = t1.grid_id  where t1.type = 'WROK_HOUR_FLOW' group by t.org_id ) t
+, (select sum(num) as num,t.org_id  from tb_grid_bank_poi_500m t left join tb_grid_hour_flow t1 on t.grid_id = t1.grid_id  where t1.type = 'HOLIDAY_HOUR_FLOW' group by t.org_id ) t1
+where t.org_id = t1.org_id
+) t where t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+--计算35-54年龄密度比
+UPDATE tb_selection_branch_collection_3km s
+SET population_profile_age_35_54_work = t.avg_num
+FROM (
+    SELECT 
+        SUM(p.age_3544 + p.age_4554) / NULLIF(SUM(p.gender_female + p.gender_male), 0) AS avg_num,
+        g.org_id
+    FROM tb_grid_pop_attr1 p
+    JOIN tb_grid_bank_poi_3km g ON g.grid_id = p.grid_id
+    WHERE p.population_type = 'WORK'
+    GROUP BY g.org_id
+) t
+WHERE t.org_id = s.org_id;
+
+  
+UPDATE tb_selection_branch_collection_3km s
+SET population_profile_age_35_54_home = t.avg_num
+FROM (
+    SELECT 
+        SUM(p.age_3544 + p.age_4554) / NULLIF(SUM(p.gender_female + p.gender_male), 0) AS avg_num,
+        g.org_id
+    FROM tb_grid_pop_attr1 p
+    JOIN tb_grid_bank_poi_3km g ON g.grid_id = p.grid_id
+    WHERE p.population_type = 'HOME'
+    GROUP BY g.org_id
+) t
+WHERE t.org_id = s.org_id;
+
+  
+
+
+UPDATE tb_selection_branch_collection_1km s
+SET population_profile_age_35_54_work = t.avg_num
+FROM (
+    SELECT 
+        SUM(p.age_3544 + p.age_4554) / NULLIF(SUM(p.gender_female + p.gender_male), 0) AS avg_num,
+        g.org_id
+    FROM tb_grid_pop_attr1 p
+    JOIN tb_grid_bank_poi_1km g ON g.grid_id = p.grid_id
+    WHERE p.population_type = 'WORK'
+    GROUP BY g.org_id
+) t
+WHERE t.org_id = s.org_id;
+
+
+UPDATE tb_selection_branch_collection_1km s
+SET population_profile_age_35_54_home = t.avg_num
+FROM (
+    SELECT 
+        SUM(p.age_3544 + p.age_4554) / NULLIF(SUM(p.gender_female + p.gender_male), 0) AS avg_num,
+        g.org_id
+    FROM tb_grid_pop_attr1 p
+    JOIN tb_grid_bank_poi_1km g ON g.grid_id = p.grid_id
+    WHERE p.population_type = 'HOME'
+    GROUP BY g.org_id
+) t
+WHERE t.org_id = s.org_id;
+
+
+
+UPDATE tb_selection_branch_collection_500m s
+SET population_profile_age_35_54_work = t.avg_num
+FROM (
+    SELECT 
+        SUM(p.age_3544 + p.age_4554) / NULLIF(SUM(p.gender_female + p.gender_male), 0) AS avg_num,
+        g.org_id
+    FROM tb_grid_pop_attr1 p
+    JOIN tb_grid_bank_poi_500m g ON g.grid_id = p.grid_id
+    WHERE p.population_type = 'WORK'
+    GROUP BY g.org_id
+) t
+WHERE t.org_id = s.org_id;
+
+
+UPDATE tb_selection_branch_collection_500m s
+SET population_profile_age_35_54_home = t.avg_num
+FROM (
+    SELECT 
+        SUM(p.age_3544 + p.age_4554) / NULLIF(SUM(p.gender_female + p.gender_male), 0) AS avg_num,
+        g.org_id
+    FROM tb_grid_pop_attr1 p
+    JOIN tb_grid_bank_poi_500m g ON g.grid_id = p.grid_id
+    WHERE p.population_type = 'HOME'
+    GROUP BY g.org_id
+) t
+WHERE t.org_id = s.org_id;
+
+
+
+--计算有房占比
+update tb_selection_branch_collection_3km set population_profile_home_work = avg_num from (select sum(num)/sum(total) as avg_num,org_id from 
+(select (gender_female+gender_male) as total,tgbp.grid_id, tgpp.there_room as num from tb_grid_pop_attr1 tgbp,tb_grid_personalized_portrait tgpp 
+where tgbp.population_type ='WORK' and tgbp.grid_id = tgpp.grid_id )t,
+tb_grid_bank_poi_3km tgbp2  where t.grid_id = tgbp2.grid_id
+group by org_id) t where t.org_id = tb_selection_branch_collection_3km.org_id ;
+
+
+update tb_selection_branch_collection_3km set population_profile_home_home = avg_num from (select sum(num)/sum(total) as avg_num,org_id from 
+(select (gender_female+gender_male) as total,tgbp.grid_id, tgpp.there_room as num from tb_grid_pop_attr1 tgbp,tb_grid_personalized_portrait tgpp 
+where tgbp.population_type ='HOME' and tgbp.grid_id = tgpp.grid_id )t,
+tb_grid_bank_poi_3km tgbp2  where t.grid_id = tgbp2.grid_id
+group by org_id) t where t.org_id = tb_selection_branch_collection_3km.org_id;
+
+update tb_selection_branch_collection_1km set population_profile_home_work = avg_num from (select sum(num)/sum(total) as avg_num,org_id from 
+(select (gender_female+gender_male) as total,tgbp.grid_id, tgpp.there_room as num from tb_grid_pop_attr1 tgbp,tb_grid_personalized_portrait tgpp 
+where tgbp.population_type ='WORK' and tgbp.grid_id = tgpp.grid_id )t,
+tb_grid_bank_poi_1km tgbp2  where t.grid_id = tgbp2.grid_id
+group by org_id) t where t.org_id = tb_selection_branch_collection_1km.org_id ;
+
+
+update tb_selection_branch_collection_1km set population_profile_home_home = avg_num from (select sum(num)/sum(total) as avg_num,org_id from 
+(select (gender_female+gender_male) as total,tgbp.grid_id, tgpp.there_room as num from tb_grid_pop_attr1 tgbp,tb_grid_personalized_portrait tgpp 
+where tgbp.population_type ='HOME' and tgbp.grid_id = tgpp.grid_id )t,
+tb_grid_bank_poi_1km tgbp2  where t.grid_id = tgbp2.grid_id
+group by org_id) t where t.org_id = tb_selection_branch_collection_1km.org_id ;
+
+
+update tb_selection_branch_collection_500m set population_profile_home_work = avg_num from (select sum(num)/sum(total) as avg_num,org_id from 
+(select (gender_female+gender_male) as total,tgbp.grid_id, tgpp.there_room as num from tb_grid_pop_attr1 tgbp,tb_grid_personalized_portrait tgpp 
+where tgbp.population_type ='WORK' and tgbp.grid_id = tgpp.grid_id )t,
+tb_grid_bank_poi_500m tgbp2  where t.grid_id = tgbp2.grid_id
+group by org_id) t where t.org_id = tb_selection_branch_collection_500m.org_id ;
+
+
+update tb_selection_branch_collection_500m set population_profile_home_home = avg_num from (select sum(num)/sum(total) as avg_num,org_id from 
+(select (gender_female+gender_male) as total,tgbp.grid_id, tgpp.there_room as num from tb_grid_pop_attr1 tgbp,tb_grid_personalized_portrait tgpp 
+where tgbp.population_type ='HOME' and tgbp.grid_id = tgpp.grid_id )t,
+tb_grid_bank_poi_500m tgbp2  where t.grid_id = tgbp2.grid_id
+group by org_id) t where t.org_id = tb_selection_branch_collection_500m.org_id ;
+
+
+--有车一族
+update tb_selection_branch_collection_3km set population_profile_car_work = avg_num from (select sum(num)/sum(total) as avg_num,org_id from 
+(select (gender_female+gender_male) as total,grid_id, has_car as num from tb_grid_pop_attr1 tgbp where tgbp.population_type='WORK')t,
+tb_grid_bank_poi_3km tgbp2  where t.grid_id = tgbp2.grid_id
+group by org_id) t where t.org_id = tb_selection_branch_collection_3km.org_id ;
+
+update tb_selection_branch_collection_3km set population_profile_car_home = avg_num from (select sum(num)/sum(total) as avg_num,org_id from 
+(select (gender_female+gender_male) as total,grid_id, has_car as num from tb_grid_pop_attr1 tgbp where tgbp.population_type='HOME')t,
+tb_grid_bank_poi_3km tgbp2  where t.grid_id = tgbp2.grid_id
+group by org_id) t where t.org_id = tb_selection_branch_collection_3km.org_id ;
+
+
+update tb_selection_branch_collection_1km set population_profile_car_work = avg_num from (select sum(num)/sum(total) as avg_num,org_id from 
+(select (gender_female+gender_male) as total,grid_id, has_car as num from tb_grid_pop_attr1 tgbp where tgbp.population_type='WORK')t,
+tb_grid_bank_poi_1km tgbp2  where t.grid_id = tgbp2.grid_id
+group by org_id) t where t.org_id = tb_selection_branch_collection_1km.org_id ;
+
+update tb_selection_branch_collection_1km set population_profile_car_home = avg_num from (select sum(num)/sum(total) as avg_num,org_id from 
+(select (gender_female+gender_male) as total,grid_id, has_car as num from tb_grid_pop_attr1 tgbp where tgbp.population_type='HOME')t,
+tb_grid_bank_poi_1km tgbp2  where t.grid_id = tgbp2.grid_id
+group by org_id) t where t.org_id = tb_selection_branch_collection_1km.org_id ;
+
+
+update tb_selection_branch_collection_500m set population_profile_car_work = avg_num from (select sum(num)/sum(total) as avg_num,org_id from 
+(select (gender_female+gender_male) as total,grid_id, has_car as num from tb_grid_pop_attr1 tgbp where tgbp.population_type='WORK')t,
+tb_grid_bank_poi_500m tgbp2  where t.grid_id = tgbp2.grid_id
+group by org_id) t where t.org_id = tb_selection_branch_collection_500m.org_id ;
+
+update tb_selection_branch_collection_500m set population_profile_car_home = avg_num from (select sum(num)/sum(total) as avg_num,org_id from 
+(select (gender_female+gender_male) as total,grid_id, has_car as num from tb_grid_pop_attr1 tgbp where tgbp.population_type='HOME')t,
+tb_grid_bank_poi_500m tgbp2  where t.grid_id = tgbp2.grid_id
+group by org_id) t where t.org_id = tb_selection_branch_collection_500m.org_id ;
+
+--本科及以上占比
+update tb_selection_branch_collection_3km set population_profile_bachelor_work = avg_num from (select sum(num)/sum(total) as avg_num,org_id from 
+(select (gender_female+gender_male) as total,grid_id,  qualification_undergraduate_graduate  as num from tb_grid_pop_attr1 tgbp where tgbp.population_type='WORK')t,
+tb_grid_bank_poi_3km tgbp2  where t.grid_id = tgbp2.grid_id
+group by org_id) t where t.org_id = tb_selection_branch_collection_3km.org_id  ;
+
+
+update tb_selection_branch_collection_3km set population_profile_bachelor_home = avg_num from (select sum(num)/sum(total) as avg_num,org_id from 
+(select (gender_female+gender_male) as total,grid_id,  qualification_undergraduate_graduate  as num from tb_grid_pop_attr1 tgbp where tgbp.population_type='HOME')t,
+tb_grid_bank_poi_3km tgbp2  where t.grid_id = tgbp2.grid_id
+group by org_id) t where t.org_id = tb_selection_branch_collection_3km.org_id  ;
+
+update tb_selection_branch_collection_1km set population_profile_bachelor_work = avg_num from (select sum(num)/sum(total) as avg_num,org_id from 
+(select (gender_female+gender_male) as total,grid_id,  qualification_undergraduate_graduate  as num from tb_grid_pop_attr1 tgbp where tgbp.population_type='WORK')t,
+tb_grid_bank_poi_1km tgbp2  where t.grid_id = tgbp2.grid_id
+group by org_id) t where t.org_id = tb_selection_branch_collection_1km.org_id  ;
+
+
+update tb_selection_branch_collection_1km set population_profile_bachelor_home = avg_num from (select sum(num)/sum(total) as avg_num,org_id from 
+(select (gender_female+gender_male) as total,grid_id,  qualification_undergraduate_graduate  as num from tb_grid_pop_attr1 tgbp where tgbp.population_type='HOME')t,
+tb_grid_bank_poi_1km tgbp2  where t.grid_id = tgbp2.grid_id
+group by org_id) t where t.org_id = tb_selection_branch_collection_1km.org_id  ;
+
+
+
+update tb_selection_branch_collection_500m set population_profile_bachelor_work = avg_num from (select sum(num)/sum(total) as avg_num,org_id from 
+(select (gender_female+gender_male) as total,grid_id,  qualification_undergraduate_graduate  as num from tb_grid_pop_attr1 tgbp where tgbp.population_type='WORK')t,
+tb_grid_bank_poi_500m tgbp2  where t.grid_id = tgbp2.grid_id
+group by org_id) t where t.org_id = tb_selection_branch_collection_500m.org_id  ;
+
+
+update tb_selection_branch_collection_500m set population_profile_bachelor_home = avg_num from (select sum(num)/sum(total) as avg_num,org_id from 
+(select (gender_female+gender_male) as total,grid_id,  qualification_undergraduate_graduate  as num from tb_grid_pop_attr1 tgbp where tgbp.population_type='HOME')t,
+tb_grid_bank_poi_500m tgbp2  where t.grid_id = tgbp2.grid_id
+group by org_id) t where t.org_id = tb_selection_branch_collection_500m.org_id  ;
+
+
+--白领占比
+update tb_selection_branch_collection_3km set population_profile_white_collar_work = avg_num from (select sum(num)/sum(total) as avg_num,org_id from 
+(select 
+case when white_collar_general_staff_proportion = 0 then 0 else 
+(white_collar_general_staff/white_collar_general_staff_proportion) end as total,tgbp.grid_id, tgpp.white_collar_general_staff as num from tb_grid_pop_attr1 tgbp,tb_grid_personalized_portrait tgpp 
+where tgbp.population_type ='WORK' and tgbp.grid_id = tgpp.grid_id )t,
+tb_grid_bank_poi_3km tgbp2  where t.grid_id = tgbp2.grid_id
+group by org_id) t where t.org_id = tb_selection_branch_collection_3km.org_id ;
+
+
+update tb_selection_branch_collection_3km set population_profile_white_collar_home = avg_num from (select sum(num)/sum(total) as avg_num,org_id from 
+(select 
+case when white_collar_general_staff_proportion = 0 then 0 else 
+(white_collar_general_staff/white_collar_general_staff_proportion) end as total,tgbp.grid_id, tgpp.white_collar_general_staff as num from tb_grid_pop_attr1 tgbp,tb_grid_personalized_portrait tgpp 
+where tgbp.population_type ='HOME' and tgbp.grid_id = tgpp.grid_id )t,
+tb_grid_bank_poi_3km tgbp2  where t.grid_id = tgbp2.grid_id
+group by org_id) t where t.org_id = tb_selection_branch_collection_3km.org_id;
+
+update tb_selection_branch_collection_1km set population_profile_white_collar_work = avg_num from (select sum(num)/sum(total) as avg_num,org_id from 
+(select 
+case when white_collar_general_staff_proportion = 0 then 0 else 
+(white_collar_general_staff/white_collar_general_staff_proportion) end as total,tgbp.grid_id, tgpp.white_collar_general_staff as num from tb_grid_pop_attr1 tgbp,tb_grid_personalized_portrait tgpp 
+where tgbp.population_type ='WORK' and tgbp.grid_id = tgpp.grid_id )t,
+tb_grid_bank_poi_1km tgbp2  where t.grid_id = tgbp2.grid_id
+group by org_id) t where t.org_id = tb_selection_branch_collection_1km.org_id ;
+
+
+update tb_selection_branch_collection_1km set population_profile_white_collar_home = avg_num from (select sum(num)/sum(total) as avg_num,org_id from 
+(select 
+case when white_collar_general_staff_proportion = 0 then 0 else 
+(white_collar_general_staff/white_collar_general_staff_proportion) end as total,tgbp.grid_id, tgpp.white_collar_general_staff as num from tb_grid_pop_attr1 tgbp,tb_grid_personalized_portrait tgpp 
+where tgbp.population_type ='HOME' and tgbp.grid_id = tgpp.grid_id )t,
+tb_grid_bank_poi_1km tgbp2  where t.grid_id = tgbp2.grid_id
+group by org_id) t where t.org_id = tb_selection_branch_collection_1km.org_id ;
+
+
+update tb_selection_branch_collection_500m set population_profile_white_collar_work = avg_num from (select sum(num)/sum(total) as avg_num,org_id from 
+(select 
+case when white_collar_general_staff_proportion = 0 then 0 else 
+(white_collar_general_staff/white_collar_general_staff_proportion) end as total,tgbp.grid_id, tgpp.white_collar_general_staff as num from tb_grid_pop_attr1 tgbp,tb_grid_personalized_portrait tgpp 
+where tgbp.population_type ='WORK' and tgbp.grid_id = tgpp.grid_id )t,
+tb_grid_bank_poi_500m tgbp2  where t.grid_id = tgbp2.grid_id
+group by org_id) t where t.org_id = tb_selection_branch_collection_500m.org_id ;
+
+
+update tb_selection_branch_collection_500m set population_profile_white_collar_home = avg_num from (select sum(num)/sum(total) as avg_num,org_id from 
+(select 
+case when white_collar_general_staff_proportion = 0 then 0 else 
+(white_collar_general_staff/white_collar_general_staff_proportion) end as total,tgbp.grid_id, tgpp.white_collar_general_staff as num from tb_grid_pop_attr1 tgbp,tb_grid_personalized_portrait tgpp 
+where tgbp.population_type ='HOME' and tgbp.grid_id = tgpp.grid_id )t,
+tb_grid_bank_poi_500m tgbp2  where t.grid_id = tgbp2.grid_id
+group by org_id) t where t.org_id = tb_selection_branch_collection_500m.org_id ;
+
+--中产占比
+
+update tb_selection_branch_collection_3km set population_profile_senior_middle_class_work = avg_num from (select sum(num)/sum(total) as avg_num,org_id from 
+(select 
+case when senior_middle_class_proportion = 0 then 0 else
+(senior_middle_class/senior_middle_class_proportion) end as total,tgbp.grid_id, tgpp.senior_middle_class as num from tb_grid_pop_attr1 tgbp,tb_grid_personalized_portrait tgpp 
+where tgbp.population_type ='WORK' and tgbp.grid_id = tgpp.grid_id )t,
+tb_grid_bank_poi_3km tgbp2  where t.grid_id = tgbp2.grid_id
+group by org_id) t where t.org_id = tb_selection_branch_collection_3km.org_id ;
+
+
+update tb_selection_branch_collection_3km set population_profile_senior_middle_class_home = avg_num from (select sum(num)/sum(total) as avg_num,org_id from 
+(select 
+case when senior_middle_class_proportion = 0 then 0 else
+(senior_middle_class/senior_middle_class_proportion) end as total,tgbp.grid_id, tgpp.senior_middle_class as num from tb_grid_pop_attr1 tgbp,tb_grid_personalized_portrait tgpp 
+where tgbp.population_type ='HOME' and tgbp.grid_id = tgpp.grid_id )t,
+tb_grid_bank_poi_3km tgbp2  where t.grid_id = tgbp2.grid_id
+group by org_id) t where t.org_id = tb_selection_branch_collection_3km.org_id;
+
+update tb_selection_branch_collection_1km set population_profile_senior_middle_class_work = avg_num from (select sum(num)/sum(total) as avg_num,org_id from 
+(select 
+case when senior_middle_class_proportion = 0 then 0 else
+(senior_middle_class/senior_middle_class_proportion) end as total,tgbp.grid_id, tgpp.senior_middle_class as num from tb_grid_pop_attr1 tgbp,tb_grid_personalized_portrait tgpp 
+where tgbp.population_type ='WORK' and tgbp.grid_id = tgpp.grid_id )t,
+tb_grid_bank_poi_1km tgbp2  where t.grid_id = tgbp2.grid_id
+group by org_id) t where t.org_id = tb_selection_branch_collection_1km.org_id ;
+
+
+update tb_selection_branch_collection_1km set population_profile_senior_middle_class_home = avg_num from (select sum(num)/sum(total) as avg_num,org_id from 
+(select 
+case when senior_middle_class_proportion = 0 then 0 else
+(senior_middle_class/senior_middle_class_proportion) end as total,tgbp.grid_id, tgpp.senior_middle_class as num from tb_grid_pop_attr1 tgbp,tb_grid_personalized_portrait tgpp 
+where tgbp.population_type ='HOME' and tgbp.grid_id = tgpp.grid_id )t,
+tb_grid_bank_poi_1km tgbp2  where t.grid_id = tgbp2.grid_id
+group by org_id) t where t.org_id = tb_selection_branch_collection_1km.org_id ;
+
+
+update tb_selection_branch_collection_500m set population_profile_senior_middle_class_work = avg_num from (select sum(num)/sum(total) as avg_num,org_id from 
+(select 
+case when senior_middle_class_proportion = 0 then 0 else
+(senior_middle_class/senior_middle_class_proportion) end as total,tgbp.grid_id, tgpp.senior_middle_class as num from tb_grid_pop_attr1 tgbp,tb_grid_personalized_portrait tgpp 
+where tgbp.population_type ='WORK' and tgbp.grid_id = tgpp.grid_id )t,
+tb_grid_bank_poi_500m tgbp2  where t.grid_id = tgbp2.grid_id
+group by org_id) t where t.org_id = tb_selection_branch_collection_500m.org_id ;
+
+
+update tb_selection_branch_collection_500m set population_profile_senior_middle_class_home = avg_num from (select sum(num)/sum(total) as avg_num,org_id from 
+(select 
+case when senior_middle_class_proportion = 0 then 0 else
+(senior_middle_class/senior_middle_class_proportion) end as total,tgbp.grid_id, tgpp.senior_middle_class as num from tb_grid_pop_attr1 tgbp,tb_grid_personalized_portrait tgpp 
+where tgbp.population_type ='HOME' and tgbp.grid_id = tgpp.grid_id )t,
+tb_grid_bank_poi_500m tgbp2  where t.grid_id = tgbp2.grid_id
+group by org_id) t where t.org_id = tb_selection_branch_collection_500m.org_id ;
+
+--银发占比
+
+UPDATE tb_selection_branch_collection_3km 
+SET population_profile_urban_silver_haired_home = avg_num 
+FROM (
+    SELECT 
+        -- ? 核心修复 1：使用 NULLIF 防止分母为 0 崩溃
+        -- ? 核心修复 2：转为 ::NUMERIC 防止整数除法丢失小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN urban_silver_haired_proportion = 0 THEN 0 
+                ELSE (urban_silver_haired / urban_silver_haired_proportion) 
+            END AS total,
+            grid_id, 
+            urban_silver_haired AS num 
+        FROM tb_grid_personalized_portrait 
+        WHERE population_type = 'HOME'
+    ) t,
+    tb_grid_bank_poi_3km tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+
+
+UPDATE tb_selection_branch_collection_3km 
+SET population_profile_urban_silver_haired_home = avg_num 
+FROM (
+    SELECT 
+        -- ? 核心修复 1：使用 NULLIF 防止分母为 0 崩溃
+        -- ? 核心修复 2：转为 ::NUMERIC 防止整数除法丢失小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN urban_silver_haired_proportion = 0 THEN 0 
+                ELSE (urban_silver_haired / urban_silver_haired_proportion) 
+            END AS total,
+            tgbp.grid_id, 
+            tgpp.urban_silver_haired AS num 
+        FROM tb_grid_pop_attr1 tgbp
+        JOIN tb_grid_personalized_portrait tgpp ON tgbp.grid_id = tgpp.grid_id
+        WHERE tgbp.population_type = 'HOME'
+    ) t,
+    tb_grid_bank_poi_3km tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+UPDATE tb_selection_branch_collection_3km 
+SET population_profile_urban_silver_haired_work = avg_num 
+FROM (
+    SELECT 
+        -- ? 核心修复 1：使用 NULLIF 防止分母为 0 崩溃
+        -- ? 核心修复 2：转为 ::NUMERIC 防止整数除法丢失小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN urban_silver_haired_proportion = 0 THEN 0 
+                ELSE (urban_silver_haired / urban_silver_haired_proportion) 
+            END AS total,
+            grid_id, 
+            urban_silver_haired AS num 
+        FROM tb_grid_personalized_portrait 
+        WHERE population_type = 'WORK'
+    ) t,
+    tb_grid_bank_poi_3km tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+UPDATE tb_selection_branch_collection_1km 
+SET population_profile_urban_silver_haired_home = avg_num 
+FROM (
+    SELECT 
+        -- ? 核心修复 1：使用 NULLIF 防止分母为 0 崩溃
+        -- ? 核心修复 2：转为 ::NUMERIC 防止整数除法丢失小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN urban_silver_haired_proportion = 0 THEN 0 
+                ELSE (urban_silver_haired / urban_silver_haired_proportion) 
+            END AS total,
+            grid_id, 
+            urban_silver_haired AS num 
+        FROM tb_grid_personalized_portrait 
+        WHERE population_type = 'HOME'
+    ) t,
+    tb_grid_bank_poi_1km tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+UPDATE tb_selection_branch_collection_1km 
+SET population_profile_urban_silver_haired_work = avg_num 
+FROM (
+    SELECT 
+        -- ? 核心修复 1：使用 NULLIF 防止分母为 0 崩溃
+        -- ? 核心修复 2：转为 ::NUMERIC 防止整数除法丢失小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN urban_silver_haired_proportion = 0 THEN 0 
+                ELSE (urban_silver_haired / urban_silver_haired_proportion) 
+            END AS total,
+            grid_id, 
+            urban_silver_haired AS num 
+        FROM tb_grid_personalized_portrait 
+        WHERE population_type = 'WORK'
+    ) t,
+    tb_grid_bank_poi_1km tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+UPDATE tb_selection_branch_collection_500m 
+SET population_profile_urban_silver_haired_work = avg_num 
+FROM (
+    SELECT 
+        -- ? 核心修复 1：使用 NULLIF 防止分母为 0 崩溃
+        -- ? 核心修复 2：转为 ::NUMERIC 防止整数除法丢失小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN urban_silver_haired_proportion = 0 THEN 0 
+                ELSE (urban_silver_haired / urban_silver_haired_proportion) 
+            END AS total,
+            grid_id, 
+            urban_silver_haired AS num 
+        FROM tb_grid_personalized_portrait 
+        WHERE population_type = 'WORK'
+    ) t,
+    tb_grid_bank_poi_500m tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+UPDATE tb_selection_branch_collection_500m 
+SET population_profile_urban_silver_haired_home = avg_num 
+FROM (
+    SELECT 
+        -- ? 核心修复 1：使用 NULLIF 防止分母为 0 崩溃
+        -- ? 核心修复 2：转为 ::NUMERIC 防止整数除法丢失小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN urban_silver_haired_proportion = 0 THEN 0 
+                ELSE (urban_silver_haired / urban_silver_haired_proportion) 
+            END AS total,
+            grid_id, 
+            urban_silver_haired AS num 
+        FROM tb_grid_personalized_portrait 
+        WHERE population_type = 'HOME'
+    ) t,
+    tb_grid_bank_poi_500m tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+--金融理财人群占比
+update tb_selection_branch_collection_3km set population_profile_financial_management_work = avg_num from (select sum(num)/sum(total) as avg_num,org_id from 
+(select 
+case when financial_management_proportion = 0 then 0 else
+(tgpp.financial_management/financial_management_proportion) end as total,tgbp.grid_id, tgpp.financial_management as num from tb_grid_pop_attr1 tgbp,tb_grid_personalized_portrait tgpp 
+where tgbp.population_type ='WORK' and tgbp.grid_id = tgpp.grid_id )t,
+tb_grid_bank_poi_3km tgbp2  where t.grid_id = tgbp2.grid_id
+group by org_id) t where t.org_id = tb_selection_branch_collection_3km.org_id ;
+
+
+update tb_selection_branch_collection_3km set population_profile_financial_management_home = avg_num from (select sum(num)/sum(total) as avg_num,org_id from 
+(select 
+case when financial_management_proportion = 0 then 0 else
+(tgpp.financial_management/financial_management_proportion) end as total,tgbp.grid_id, tgpp.financial_management as num from tb_grid_pop_attr1 tgbp,tb_grid_personalized_portrait tgpp 
+where tgbp.population_type ='HOME' and tgbp.grid_id = tgpp.grid_id )t,
+tb_grid_bank_poi_3km tgbp2  where t.grid_id = tgbp2.grid_id
+group by org_id) t where t.org_id = tb_selection_branch_collection_3km.org_id;
+
+update tb_selection_branch_collection_1km set population_profile_financial_management_work = avg_num from (select sum(num)/sum(total) as avg_num,org_id from 
+(select 
+case when financial_management_proportion = 0 then 0 else
+(tgpp.financial_management/financial_management_proportion) end as total,tgbp.grid_id, tgpp.financial_management as num from tb_grid_pop_attr1 tgbp,tb_grid_personalized_portrait tgpp 
+where tgbp.population_type ='WORK' and tgbp.grid_id = tgpp.grid_id )t,
+tb_grid_bank_poi_1km tgbp2  where t.grid_id = tgbp2.grid_id
+group by org_id) t where t.org_id = tb_selection_branch_collection_1km.org_id ;
+
+
+UPDATE tb_selection_branch_collection_1km 
+SET population_profile_financial_management_home = avg_num 
+FROM (
+    SELECT 
+        -- ⚡ 核心修复 1：使用 NULLIF 防止分母为 0 崩溃
+        -- ⚡ 核心修复 2：转为 ::NUMERIC 确保小数精度不丢失
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN financial_management_proportion = 0 THEN 0 
+                ELSE (tgpp.financial_management / financial_management_proportion) 
+            END AS total,
+            tgbp.grid_id, 
+            tgpp.financial_management AS num 
+        FROM tb_grid_pop_attr1 tgbp
+        JOIN tb_grid_personalized_portrait tgpp ON tgbp.grid_id = tgpp.grid_id
+        WHERE tgbp.population_type = 'HOME'
+    ) t,
+    tb_grid_bank_poi_1km tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+
+update tb_selection_branch_collection_500m set population_profile_financial_management_work = avg_num from (select sum(num)/sum(total) as avg_num,org_id from 
+(select 
+case when financial_management_proportion = 0 then 0 else
+(tgpp.financial_management/financial_management_proportion) end as total,tgbp.grid_id, tgpp.financial_management as num from tb_grid_pop_attr1 tgbp,tb_grid_personalized_portrait tgpp 
+where tgbp.population_type ='WORK' and tgbp.grid_id = tgpp.grid_id )t,
+tb_grid_bank_poi_500m tgbp2  where t.grid_id = tgbp2.grid_id
+group by org_id) t where t.org_id = tb_selection_branch_collection_500m.org_id ;
+
+
+UPDATE tb_selection_branch_collection_500m 
+SET population_profile_financial_management_home = avg_num 
+FROM (
+    SELECT 
+        -- ⚡ 核心修复 1：使用 NULLIF 防止分母为 0 崩溃
+        -- ⚡ 核心修复 2：转为 ::NUMERIC 确保小数精度不丢失
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN financial_management_proportion = 0 THEN 0 
+                ELSE (tgpp.financial_management / financial_management_proportion) 
+            END AS total,
+            tgbp.grid_id, 
+            tgpp.financial_management AS num 
+        FROM tb_grid_pop_attr1 tgbp
+        JOIN tb_grid_personalized_portrait tgpp ON tgbp.grid_id = tgpp.grid_id
+        WHERE tgbp.population_type = 'HOME'
+    ) t,
+    tb_grid_bank_poi_500m tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+--消费能力预测高占比
+
+UPDATE tb_selection_branch_collection_3km
+SET population_profile_consume_high_home = avg_num
+FROM
+  (
+    SELECT
+      -- 2. 修复点：防止全表聚合后 SUM(total) 为 0 导致报错
+      SUM(num) / NULLIF(SUM(total), 0) AS avg_num,
+      org_id
+    FROM
+      (
+        SELECT 
+          -- 1. 修复点：防止比例 consume_high_proportion 为 0 导致报错
+          (consume_high / NULLIF(consume_high_proportion, 0)) AS total, 
+          grid_id, 
+          consume_high AS num 
+        FROM tb_grid_pop_attr1 tgbp 
+        WHERE tgbp.population_type = 'HOME'
+      ) t,
+      tb_grid_bank_poi_3km tgbp2
+    WHERE
+      t.grid_id = tgbp2.grid_id
+    GROUP BY
+      org_id
+  ) t
+WHERE
+  t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+UPDATE tb_selection_branch_collection_3km
+SET population_profile_consume_high_work = avg_num
+FROM
+  (
+    SELECT
+      -- 2. 修复点：防止全表聚合后 SUM(total) 为 0 导致报错
+      SUM(num) / NULLIF(SUM(total), 0) AS avg_num,
+      org_id
+    FROM
+      (
+        SELECT 
+          -- 1. 修复点：防止比例 consume_high_proportion 为 0 导致报错
+          (consume_high / NULLIF(consume_high_proportion, 0)) AS total, 
+          grid_id, 
+          consume_high AS num 
+        FROM tb_grid_pop_attr1 tgbp 
+        WHERE tgbp.population_type = 'WORK'
+      ) t,
+      tb_grid_bank_poi_3km tgbp2
+    WHERE
+      t.grid_id = tgbp2.grid_id
+    GROUP BY
+      org_id
+  ) t
+WHERE
+  t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+
+
+UPDATE tb_selection_branch_collection_1km
+SET population_profile_consume_high_home = avg_num
+FROM
+  (
+    SELECT
+      -- 2. 修复点：防止全表聚合后 SUM(total) 为 0 导致报错
+      SUM(num) / NULLIF(SUM(total), 0) AS avg_num,
+      org_id
+    FROM
+      (
+        SELECT 
+          -- 1. 修复点：防止比例 consume_high_proportion 为 0 导致报错
+          (consume_high / NULLIF(consume_high_proportion, 0)) AS total, 
+          grid_id, 
+          consume_high AS num 
+        FROM tb_grid_pop_attr1 tgbp 
+        WHERE tgbp.population_type = 'HOME'
+      ) t,
+      tb_grid_bank_poi_1km tgbp2
+    WHERE
+      t.grid_id = tgbp2.grid_id
+    GROUP BY
+      org_id
+  ) t
+WHERE
+  t.org_id = tb_selection_branch_collection_1km.org_id;
+
+
+UPDATE tb_selection_branch_collection_1km
+SET population_profile_consume_high_work = avg_num
+FROM
+  (
+    SELECT
+      -- 2. 修复点：防止全表聚合后 SUM(total) 为 0 导致报错
+      SUM(num) / NULLIF(SUM(total), 0) AS avg_num,
+      org_id
+    FROM
+      (
+        SELECT 
+          -- 1. 修复点：防止比例 consume_high_proportion 为 0 导致报错
+          (consume_high / NULLIF(consume_high_proportion, 0)) AS total, 
+          grid_id, 
+          consume_high AS num 
+        FROM tb_grid_pop_attr1 tgbp 
+        WHERE tgbp.population_type = 'WORK'
+      ) t,
+      tb_grid_bank_poi_1km tgbp2
+    WHERE
+      t.grid_id = tgbp2.grid_id
+    GROUP BY
+      org_id
+  ) t
+WHERE
+  t.org_id = tb_selection_branch_collection_1km.org_id;
+
+
+
+
+
+UPDATE tb_selection_branch_collection_500m
+SET population_profile_consume_high_home = avg_num
+FROM
+  (
+    SELECT
+      -- 2. 修复点：防止全表聚合后 SUM(total) 为 0 导致报错
+      SUM(num) / NULLIF(SUM(total), 0) AS avg_num,
+      org_id
+    FROM
+      (
+        SELECT 
+          -- 1. 修复点：防止比例 consume_high_proportion 为 0 导致报错
+          (consume_high / NULLIF(consume_high_proportion, 0)) AS total, 
+          grid_id, 
+          consume_high AS num 
+        FROM tb_grid_pop_attr1 tgbp 
+        WHERE tgbp.population_type = 'HOME'
+      ) t,
+      tb_grid_bank_poi_500m tgbp2
+    WHERE
+      t.grid_id = tgbp2.grid_id
+    GROUP BY
+      org_id
+  ) t
+WHERE
+  t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+UPDATE tb_selection_branch_collection_500m
+SET population_profile_consume_high_work = avg_num
+FROM
+  (
+    SELECT
+      -- 2. 修复点：防止全表聚合后 SUM(total) 为 0 导致报错
+      SUM(num) / NULLIF(SUM(total), 0) AS avg_num,
+      org_id
+    FROM
+      (
+        SELECT 
+          -- 1. 修复点：防止比例 consume_high_proportion 为 0 导致报错
+          (consume_high / NULLIF(consume_high_proportion, 0)) AS total, 
+          grid_id, 
+          consume_high AS num 
+        FROM tb_grid_pop_attr1 tgbp 
+        WHERE tgbp.population_type = 'WORK'
+      ) t,
+      tb_grid_bank_poi_500m tgbp2
+    WHERE
+      t.grid_id = tgbp2.grid_id
+    GROUP BY
+      org_id
+  ) t
+WHERE
+  t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+--高净值人群
+-- =========================================================================
+-- 1. 更新 3km 表的 WORK 数据
+-- =========================================================================
+UPDATE tb_selection_branch_collection_3km
+SET population_profile_hieg_end_individual_work = avg_num
+FROM (
+    SELECT 
+        SUM(num) / NULLIF(SUM(total), 0) AS avg_num, 
+        org_id 
+    FROM (
+        SELECT 
+            (hieg_end_individual / NULLIF(hieg_end_individual_proportion, 0)) AS total,
+            tgbp.grid_id, 
+            tgpp.hieg_end_individual AS num 
+        FROM tb_grid_pop_attr1 tgbp, tb_grid_personalized_portrait tgpp 
+        WHERE tgbp.population_type = 'WORK' AND tgbp.grid_id = tgpp.grid_id 
+    ) t,
+    tb_grid_bank_poi_3km tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+-- =========================================================================
+-- 2. 更新 3km 表的 HOME 数据
+-- =========================================================================
+UPDATE tb_selection_branch_collection_3km
+SET population_profile_hieg_end_individual_home = avg_num
+FROM (
+    SELECT 
+        SUM(num) / NULLIF(SUM(total), 0) AS avg_num, 
+        org_id 
+    FROM (
+        SELECT 
+            (hieg_end_individual / NULLIF(hieg_end_individual_proportion, 0)) AS total,
+            tgbp.grid_id, 
+            tgpp.hieg_end_individual AS num 
+        FROM tb_grid_pop_attr1 tgbp, tb_grid_personalized_portrait tgpp 
+        WHERE tgbp.population_type = 'HOME' AND tgbp.grid_id = tgpp.grid_id 
+    ) t,
+    tb_grid_bank_poi_3km tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+-- =========================================================================
+-- 3. 更新 1km 表的 WORK 数据
+-- =========================================================================
+UPDATE tb_selection_branch_collection_1km
+SET population_profile_hieg_end_individual_work = avg_num
+FROM (
+    SELECT 
+        SUM(num) / NULLIF(SUM(total), 0) AS avg_num, 
+        org_id 
+    FROM (
+        SELECT 
+            (hieg_end_individual / NULLIF(hieg_end_individual_proportion, 0)) AS total,
+            tgbp.grid_id, 
+            tgpp.hieg_end_individual AS num 
+        FROM tb_grid_pop_attr1 tgbp, tb_grid_personalized_portrait tgpp 
+        WHERE tgbp.population_type = 'WORK' AND tgbp.grid_id = tgpp.grid_id 
+    ) t,
+    tb_grid_bank_poi_1km tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+
+-- =========================================================================
+-- 4. 更新 1km 表的 HOME 数据
+-- =========================================================================
+UPDATE tb_selection_branch_collection_1km
+SET population_profile_hieg_end_individual_home = avg_num
+FROM (
+    SELECT 
+        SUM(num) / NULLIF(SUM(total), 0) AS avg_num, 
+        org_id 
+    FROM (
+        SELECT 
+            (hieg_end_individual / NULLIF(hieg_end_individual_proportion, 0)) AS total,
+            tgbp.grid_id, 
+            tgpp.hieg_end_individual AS num 
+        FROM tb_grid_pop_attr1 tgbp, tb_grid_personalized_portrait tgpp 
+        WHERE tgbp.population_type = 'HOME' AND tgbp.grid_id = tgpp.grid_id 
+    ) t,
+    tb_grid_bank_poi_1km tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+
+UPDATE tb_selection_branch_collection_500m 
+SET population_profile_hieg_end_individual_work = avg_num 
+FROM (
+    SELECT 
+        -- ⚡ 核心修复 1：使用 NULLIF 防止分母为 0 崩溃
+        -- ⚡ 核心修复 2：转为 ::NUMERIC 确保小数精度不丢失
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN hieg_end_individual_proportion = 0 THEN 0 
+                ELSE (hieg_end_individual / hieg_end_individual_proportion) 
+            END AS total,
+            tgbp.grid_id, 
+            tgpp.hieg_end_individual AS num 
+        FROM tb_grid_pop_attr1 tgbp
+        JOIN tb_grid_personalized_portrait tgpp ON tgbp.grid_id = tgpp.grid_id
+        WHERE tgbp.population_type = 'WORK'
+    ) t,
+    tb_grid_bank_poi_500m tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+
+UPDATE tb_selection_branch_collection_500m 
+SET population_profile_hieg_end_individual_home = avg_num 
+FROM (
+    SELECT 
+        -- ⚡ 核心修复 1：使用 NULLIF 防止分母为 0 崩溃
+        -- ⚡ 核心修复 2：转为 ::NUMERIC 确保小数精度不丢失
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN hieg_end_individual_proportion = 0 THEN 0 
+                ELSE (hieg_end_individual / hieg_end_individual_proportion) 
+            END AS total,
+            tgbp.grid_id, 
+            tgpp.hieg_end_individual AS num 
+        FROM tb_grid_pop_attr1 tgbp
+        JOIN tb_grid_personalized_portrait tgpp ON tgbp.grid_id = tgpp.grid_id
+        WHERE tgbp.population_type = 'HOME'
+    ) t,
+    tb_grid_bank_poi_500m tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+
+
+--高资产人群
+
+
+
+UPDATE tb_selection_branch_collection_3km 
+SET population_profile_wealthy_home = avg_num 
+FROM (
+    SELECT 
+        -- ⚡ 核心修复 1：使用 NULLIF 防止分母为 0 崩溃
+        -- ⚡ 核心修复 2：转为 ::NUMERIC 确保小数精度不丢失
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            (gender_female + gender_male) AS total,
+            grid_id, 
+            asset_grade_high AS num 
+        FROM tb_grid_pop_attr1 tgbp 
+        WHERE tgbp.population_type = 'HOME'
+    ) t,
+    tb_grid_bank_poi_3km tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+
+
+
+UPDATE tb_selection_branch_collection_1km 
+SET population_profile_wealthy_home = avg_num 
+FROM (
+    SELECT 
+        -- ⚡ 核心修复 1：使用 NULLIF 防止分母为 0 崩溃
+        -- ⚡ 核心修复 2：转为 ::NUMERIC 确保小数精度不丢失
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            (gender_female + gender_male) AS total,
+            grid_id, 
+            asset_grade_high AS num 
+        FROM tb_grid_pop_attr1 tgbp 
+        WHERE tgbp.population_type = 'HOME'
+    ) t,
+    tb_grid_bank_poi_1km tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+
+
+
+UPDATE tb_selection_branch_collection_500m 
+SET population_profile_wealthy_work = avg_num 
+FROM (
+    SELECT 
+        -- ⚡ 核心修复 1：使用 NULLIF 防止分母为 0 崩溃
+        -- ⚡ 核心修复 2：转为 ::NUMERIC 确保小数精度不丢失
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            (gender_female + gender_male) AS total,
+            grid_id, 
+            asset_grade_high AS num 
+        FROM tb_grid_pop_attr1 tgbp 
+        WHERE tgbp.population_type = 'WORK' -- 👈 已确认为 WORK
+    ) t,
+    tb_grid_bank_poi_500m tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+
+UPDATE tb_selection_branch_collection_500m 
+SET population_profile_wealthy_home = avg_num 
+FROM (
+    SELECT 
+        -- ⚡ 核心修复 1：使用 NULLIF 防止分母为 0 崩溃
+        -- ⚡ 核心修复 2：转为 ::NUMERIC 确保小数精度不丢失
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            (gender_female + gender_male) AS total,
+            grid_id, 
+            asset_grade_high AS num 
+        FROM tb_grid_pop_attr1 tgbp 
+        WHERE tgbp.population_type = 'HOME' -- 👈 已确认为 HOME
+    ) t,
+    tb_grid_bank_poi_500m tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+
+UPDATE tb_selection_branch_collection_3km 
+SET population_profile_wealthy_work = 
+    -- ⚡ 核心修复 3：使用 NULLIF 防止计算 hieg_end / avg_num 时 avg_num 为 0 导致再次崩溃
+    population_profile_hieg_end_individual_work / NULLIF(avg_num, 0) 
+FROM (
+    SELECT 
+        -- ⚡ 核心修复 1：使用 NULLIF 防止分母 sum(total) 为 0 崩溃
+        -- ⚡ 核心修复 2：转为 ::NUMERIC 确保小数精度不丢失
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id -- 👈 必须带上关联键进行分组
+    FROM (
+        SELECT 
+            (gender_female + gender_male) AS total,
+            grid_id, 
+            asset_grade_high AS num 
+        FROM tb_grid_pop_attr1 tgbp
+        WHERE tgbp.population_type = 'WORK'
+    ) t,
+    tb_grid_bank_poi_3km tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id -- 👈 按机构号分组计算各自的平均值
+) t 
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id; -- 👈 建立精准的更新关联关系
+
+
+--2万资产占比
+
+
+UPDATE tb_selection_branch_collection_3km 
+SET population_profile_income_2w_work = avg_num 
+FROM (
+    SELECT 
+        -- ⚡ 核心修复 1：使用 NULLIF 防止分母为 0 崩溃
+        -- ⚡ 核心修复 2：转为 ::NUMERIC 确保小数精度不丢失
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            (gender_female + gender_male) AS total,
+            grid_id, 
+            income_20000 AS num 
+        FROM tb_grid_pop_attr1 tgbp 
+        WHERE tgbp.population_type = 'WORK'
+    ) t,
+    tb_grid_bank_poi_3km tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+UPDATE tb_selection_branch_collection_3km 
+SET population_profile_income_2w_home = avg_num 
+FROM (
+    SELECT 
+        -- ⚡ 核心修复 1：使用 NULLIF 防止分母为 0 崩溃
+        -- ⚡ 核心修复 2：转为 ::NUMERIC 确保小数精度不丢失
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            (gender_female + gender_male) AS total,
+            grid_id, 
+            income_20000 AS num 
+        FROM tb_grid_pop_attr1 tgbp 
+        WHERE tgbp.population_type = 'HOME' -- 👈 已确认为 HOME
+    ) t,
+    tb_grid_bank_poi_3km tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+
+
+UPDATE tb_selection_branch_collection_1km 
+SET population_profile_income_2w_home = avg_num 
+FROM (
+    SELECT 
+        -- ⚡ 核心修复 1：使用 NULLIF 防止分母为 0 崩溃
+        -- ⚡ 核心修复 2：转为 ::NUMERIC 确保小数精度不丢失
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            (gender_female + gender_male) AS total,
+            grid_id, 
+            income_20000 AS num 
+        FROM tb_grid_pop_attr1 tgbp 
+        WHERE tgbp.population_type = 'HOME'
+    ) t,
+    tb_grid_bank_poi_1km tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+
+
+
+UPDATE tb_selection_branch_collection_500m 
+SET population_profile_income_2w_work = avg_num 
+FROM (
+    SELECT 
+        -- ⚡ 核心修复 1：使用 NULLIF 防止分母为 0 崩溃
+        -- ⚡ 核心修复 2：转为 ::NUMERIC 确保小数精度不丢失
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            (gender_female + gender_male) AS total,
+            grid_id, 
+            income_20000 AS num 
+        FROM tb_grid_pop_attr1 tgbp 
+        WHERE tgbp.population_type = 'WORK' -- 👈 已确认为 WORK
+    ) t,
+    tb_grid_bank_poi_500m tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+UPDATE tb_selection_branch_collection_500m 
+SET population_profile_income_2w_home = avg_num 
+FROM (
+    SELECT 
+        -- ⚡ 核心修复 1：使用 NULLIF 防止分母为 0 崩溃
+        -- ⚡ 核心修复 2：转为 ::NUMERIC 确保小数精度不丢失
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            (gender_female + gender_male) AS total,
+            grid_id, 
+            income_20000 AS num 
+        FROM tb_grid_pop_attr1 tgbp 
+        WHERE tgbp.population_type = 'HOME' -- 👈 已确认为 HOME
+    ) t,
+    tb_grid_bank_poi_500m tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+
+--4k-7.9k占比
+
+UPDATE tb_selection_branch_collection_3km 
+SET population_profile_income_7999_work = avg_num 
+FROM (
+    SELECT 
+        -- ⚡ 核心修复：使用 NULLIF 防止分母为 0 崩溃，并转为 ::NUMERIC 保留小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            (gender_female + gender_male) AS total,
+            grid_id, 
+            tgbp.income_9999 AS num 
+        FROM tb_grid_pop_attr1 tgbp 
+        WHERE tgbp.population_type = 'WORK'
+    ) t,
+    tb_grid_bank_poi_3km tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+UPDATE tb_selection_branch_collection_3km 
+SET population_profile_income_7999_home = avg_num 
+FROM (
+    SELECT 
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            (gender_female + gender_male) AS total,
+            grid_id, 
+            income_9999 AS num 
+        FROM tb_grid_pop_attr1 tgbp 
+        WHERE tgbp.population_type = 'HOME'
+    ) t,
+    tb_grid_bank_poi_3km tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+UPDATE tb_selection_branch_collection_1km 
+SET population_profile_income_7999_work = avg_num 
+FROM (
+    SELECT 
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            (gender_female + gender_male) AS total,
+            grid_id, 
+            income_9999 AS num 
+        FROM tb_grid_pop_attr1 tgbp 
+        WHERE tgbp.population_type = 'WORK'
+    ) t,
+    tb_grid_bank_poi_1km tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+
+
+UPDATE tb_selection_branch_collection_1km 
+SET population_profile_income_7999_home = avg_num 
+FROM (
+    SELECT 
+        -- ⚡ 核心修复：使用 NULLIF 防止分母为 0 崩溃，并转为 ::NUMERIC 保留小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            (gender_female + gender_male) AS total,
+            grid_id, 
+            income_9999 AS num 
+        FROM tb_grid_pop_attr1 tgbp 
+        WHERE tgbp.population_type = 'HOME'
+    ) t,
+    tb_grid_bank_poi_1km tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+
+UPDATE tb_selection_branch_collection_500m 
+SET population_profile_income_7999_work = avg_num 
+FROM (
+    SELECT 
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            (gender_female + gender_male) AS total,
+            grid_id, 
+            income_9999 AS num 
+        FROM tb_grid_pop_attr1 tgbp 
+        WHERE tgbp.population_type = 'WORK'
+    ) t,
+    tb_grid_bank_poi_500m tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+
+UPDATE tb_selection_branch_collection_500m 
+SET population_profile_income_7999_home = avg_num 
+FROM (
+    SELECT 
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            (gender_female + gender_male) AS total,
+            grid_id, 
+            income_9999 AS num 
+        FROM tb_grid_pop_attr1 tgbp 
+        WHERE tgbp.population_type = 'HOME'
+    ) t,
+    tb_grid_bank_poi_500m tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+--高端消费占比
+UPDATE tb_selection_branch_collection_3km 
+SET population_profile_per_high_work = avg_num 
+FROM (
+    SELECT 
+        -- ⚡ 核心修复 1：使用 NULLIF 防止分母为 0 崩溃
+        -- ⚡ 核心修复 2：转为 ::NUMERIC 确保小数精度不丢失
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN (tgpp.accessories_proportion + tgpp.electronic_digital_proportion = 0) THEN 0 
+                -- ⚡ 核心修复 3：单行计算转换为 NUMERIC，防止整数除法被截断
+                ELSE ((tgpp.accessories + tgpp.electronic_digital)::NUMERIC / (tgpp.accessories_proportion + tgpp.electronic_digital_proportion)) 
+            END AS total,
+            tgbp.grid_id, 
+            (tgpp.accessories + tgpp.electronic_digital) AS num 
+        FROM tb_grid_pop_attr1 tgbp
+        JOIN tb_grid_consumption_perference tgpp ON tgbp.grid_id = tgpp.grid_id 
+        WHERE tgbp.population_type = 'WORK'
+    ) t,
+    tb_grid_bank_poi_3km tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+UPDATE tb_selection_branch_collection_3km 
+SET population_profile_per_high_home = avg_num 
+FROM (
+    SELECT 
+        -- ⚡ 核心修复 1：使用 NULLIF 防止分母为 0 崩溃
+        -- ⚡ 核心修复 2：转为 ::NUMERIC 确保小数精度不丢失
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN (tgpp.accessories_proportion + tgpp.electronic_digital_proportion = 0) THEN 0 
+                -- ⚡ 核心修复 3：单行计算转换为 NUMERIC，防止整数除法被截断
+                ELSE ((tgpp.accessories + tgpp.electronic_digital)::NUMERIC / (tgpp.accessories_proportion + tgpp.electronic_digital_proportion)) 
+            END AS total,
+            tgbp.grid_id, 
+            (tgpp.accessories + tgpp.electronic_digital) AS num 
+        FROM tb_grid_pop_attr1 tgbp
+        JOIN tb_grid_consumption_perference tgpp ON tgbp.grid_id = tgpp.grid_id 
+        WHERE tgbp.population_type = 'HOME' -- 👈 已确认为 HOME
+    ) t,
+    tb_grid_bank_poi_3km tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+UPDATE tb_selection_branch_collection_1km 
+SET population_profile_per_high_work = avg_num 
+FROM (
+    SELECT 
+        -- ⚡ 核心修复 1：使用 NULLIF 防止分母为 0 崩溃
+        -- ⚡ 核心修复 2：转为 ::NUMERIC 确保小数精度不丢失
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN (tgpp.accessories_proportion + tgpp.electronic_digital_proportion = 0) THEN 0 
+                -- ⚡ 核心修复 3：单行计算转换为 NUMERIC，防止整数除法被截断
+                ELSE ((tgpp.accessories + tgpp.electronic_digital)::NUMERIC / (tgpp.accessories_proportion + tgpp.electronic_digital_proportion)) 
+            END AS total,
+            tgbp.grid_id, 
+            (tgpp.accessories + tgpp.electronic_digital) AS num 
+        FROM tb_grid_pop_attr1 tgbp
+        JOIN tb_grid_consumption_perference tgpp ON tgbp.grid_id = tgpp.grid_id 
+        WHERE tgbp.population_type = 'WORK' -- 👈 已确认为 WORK
+    ) t,
+    tb_grid_bank_poi_1km tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+
+
+UPDATE tb_selection_branch_collection_1km 
+SET population_profile_per_high_home = avg_num 
+FROM (
+    SELECT 
+        -- ⚡ 核心修复 1：使用 NULLIF 防止分母为 0 崩溃
+        -- ⚡ 核心修复 2：转为 ::NUMERIC 确保小数精度不丢失
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN (tgpp.accessories_proportion + tgpp.electronic_digital_proportion = 0) THEN 0 
+                -- ⚡ 核心修复 3：单行计算转换为 NUMERIC，防止整数除法被截断
+                ELSE ((tgpp.accessories + tgpp.electronic_digital)::NUMERIC / (tgpp.accessories_proportion + tgpp.electronic_digital_proportion)) 
+            END AS total,
+            tgbp.grid_id, 
+            (tgpp.accessories + tgpp.electronic_digital) AS num 
+        FROM tb_grid_pop_attr1 tgbp
+        JOIN tb_grid_consumption_perference tgpp ON tgbp.grid_id = tgpp.grid_id 
+        WHERE tgbp.population_type = 'HOME' -- 👈 已确认为 HOME
+    ) t,
+    tb_grid_bank_poi_1km tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+
+UPDATE tb_selection_branch_collection_500m 
+SET population_profile_per_high_work = avg_num 
+FROM (
+    SELECT 
+        -- ⚡ 核心修复 1：使用 NULLIF 防止分母为 0 崩溃
+        -- ⚡ 核心修复 2：转为 ::NUMERIC 确保小数精度不丢失
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN (tgpp.accessories_proportion + tgpp.electronic_digital_proportion = 0) THEN 0 
+                -- ⚡ 核心修复 3：单行计算转换为 NUMERIC，防止整数除法被截断
+                ELSE ((tgpp.accessories + tgpp.electronic_digital)::NUMERIC / (tgpp.accessories_proportion + tgpp.electronic_digital_proportion)) 
+            END AS total,
+            tgbp.grid_id, 
+            (tgpp.accessories + tgpp.electronic_digital) AS num 
+        FROM tb_grid_pop_attr1 tgbp
+        JOIN tb_grid_consumption_perference tgpp ON tgbp.grid_id = tgpp.grid_id 
+        WHERE tgbp.population_type = 'WORK' -- 👈 已确认为 WORK
+    ) t,
+    tb_grid_bank_poi_500m tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+
+UPDATE tb_selection_branch_collection_500m 
+SET population_profile_per_high_home = avg_num 
+FROM (
+    SELECT 
+        -- ⚡ 核心修复 1：使用 NULLIF 防止分母为 0 崩溃
+        -- ⚡ 核心修复 2：转为 ::NUMERIC 确保小数精度不丢失
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN (tgpp.accessories_proportion + tgpp.electronic_digital_proportion = 0) THEN 0 
+                -- ⚡ 核心修复 3：单行计算转换为 NUMERIC，防止整数除法被截断
+                ELSE ((tgpp.accessories + tgpp.electronic_digital)::NUMERIC / (tgpp.accessories_proportion + tgpp.electronic_digital_proportion)) 
+            END AS total,
+            tgbp.grid_id, 
+            (tgpp.accessories + tgpp.electronic_digital) AS num 
+        FROM tb_grid_pop_attr1 tgbp
+        JOIN tb_grid_consumption_perference tgpp ON tgbp.grid_id = tgpp.grid_id 
+        WHERE tgbp.population_type = 'HOME' -- 👈 已确认为 HOME
+    ) t,
+    tb_grid_bank_poi_500m tgbp2  
+    WHERE t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+
+--中行网点数
+
+UPDATE tb_selection_branch_collection_3km 
+SET bank_bc_num = t.num - 1 
+FROM (
+    SELECT 
+        b2.org_id,
+        COUNT(DISTINCT b1.poi_id) AS num -- ⚡ 统计与当前银行共享网格的中国银行数量
+    FROM tb_grid_bank_poi_3km b1
+    JOIN tb_grid_bank_poi_3km b2 
+      ON b1.grid_id = b2.grid_id      -- ⚡ 核心加速：通过网格 ID 直接关联，走普通 B-Tree 索引，速度极快
+    WHERE b1.bank_brand = '中国银行' 
+      AND b2.bank_brand = '中国银行'
+    GROUP BY b2.org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+
+UPDATE tb_selection_branch_collection_1km 
+SET bank_bc_num = t.num - 1 
+FROM (
+    SELECT 
+        b2.org_id,
+        COUNT(DISTINCT b1.poi_id) AS num -- ⚡ 统计与当前银行共享网格的中国银行数量
+    FROM tb_grid_bank_poi_1km b1
+    JOIN tb_grid_bank_poi_1km b2 
+      ON b1.grid_id = b2.grid_id      -- ⚡ 核心加速：直接走网格 ID 的 B-Tree 索引
+    WHERE b1.bank_brand = '中国银行' 
+      AND b2.bank_brand = '中国银行'
+    GROUP BY b2.org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+
+UPDATE tb_selection_branch_collection_500m 
+SET bank_bc_num = t.num - 1 
+FROM (
+    SELECT 
+        b2.org_id,
+        COUNT(DISTINCT b1.poi_id) AS num 
+    FROM tb_grid_bank_poi_500m b1
+    JOIN tb_grid_bank_poi_500m b2 
+      ON b1.grid_id = b2.grid_id      -- ⚡ 核心加速：利用已建联合主键中的 grid_id 闪电关联
+    WHERE b1.bank_brand = '中国银行' 
+      AND b2.bank_brand = '中国银行'
+    GROUP BY b2.org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+
+
+
+--国有银行网点数
+
+UPDATE tb_selection_branch_collection_3km 
+SET state_owned_bank_num = t.num 
+FROM (
+    SELECT 
+        t2.org_id,
+        COUNT(1) AS num 
+    FROM tb_bank_poi t1
+    JOIN tb_bank_poi t2 
+      -- ⚡ 核心加速：利用已建空间索引的 3km 正方形面，判断其他国有银行点是否在范围内
+      ON t2.geom_3km && t1.geom 
+    WHERE t1.level3_classification IN ('中国工商银行','中国建设银行','中国农业银行','交通银行','中国邮政储蓄银行') 
+      AND t2.level3_classification = '中国银行'  
+    GROUP BY t2.org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+
+UPDATE tb_selection_branch_collection_1km 
+SET state_owned_bank_num = t.num 
+FROM (
+    SELECT 
+        t2.org_id,
+        COUNT(1) AS num 
+    FROM tb_bank_poi t1
+    JOIN tb_bank_poi t2 
+      ON t2.geom_1km && t1.geom 
+    WHERE t1.level3_classification IN ('中国工商银行','中国建设银行','中国农业银行','交通银行','中国邮政储蓄银行') 
+      AND t2.level3_classification = '中国银行'  
+    GROUP BY t2.org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+
+UPDATE tb_selection_branch_collection_500m 
+SET state_owned_bank_num = t.num 
+FROM (
+    SELECT 
+        t2.org_id,
+        COUNT(1) AS num 
+    FROM tb_bank_poi t1
+    JOIN tb_bank_poi t2 
+      ON t2.geom_500m && t1.geom 
+    WHERE t1.level3_classification IN ('中国工商银行','中国建设银行','中国农业银行','交通银行','中国邮政储蓄银行') 
+      AND t2.level3_classification = '中国银行'  
+    GROUP BY t2.org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+
+--全国股份制网点数
+UPDATE tb_selection_branch_collection_3km 
+SET joint_stock_bank_num = t.num 
+FROM (
+    SELECT 
+        t2.org_id,
+        COUNT(1) AS num 
+    FROM tb_bank_poi t1
+    JOIN tb_bank_poi t2 
+      -- ⚡ 核心加速：利用已建空间索引的 3km 正方形面，闪电找出范围内的股份制银行点
+      ON t2.geom_3km && t1.geom 
+    WHERE t1.level3_classification IN ('招商银行','浦发银行','中信银行','兴业银行','民生银行','光大银行','平安银行','华夏银行','广发银行','浙商银行','恒丰银行','渤海银行') 
+      AND t2.level3_classification = '中国银行'  
+    GROUP BY t2.org_id
+) t 
+where t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+UPDATE tb_selection_branch_collection_1km 
+SET joint_stock_bank_num = t.num 
+FROM (
+    SELECT 
+        t2.org_id,
+        COUNT(1) AS num 
+    FROM tb_bank_poi t1
+    JOIN tb_bank_poi t2 
+      -- ⚡ 核心加速：利用 1km 正方形面比对边界框
+      ON t2.geom_1km && t1.geom 
+    WHERE t1.level3_classification IN ('招商银行','浦发银行','中信银行','兴业银行','民生银行','光大银行','平安银行','华夏银行','广发银行','浙商银行','恒丰银行','渤海银行') 
+      AND t2.level3_classification = '中国银行'  
+    GROUP BY t2.org_id
+) t 
+where t.org_id = tb_selection_branch_collection_1km.org_id;
+
+UPDATE tb_selection_branch_collection_500m 
+SET joint_stock_bank_num = t.num 
+FROM (
+    SELECT 
+        t2.org_id,
+        COUNT(1) AS num 
+    FROM tb_bank_poi t1
+    JOIN tb_bank_poi t2 
+      -- ⚡ 核心加速：利用 500m 正方形面比对边界框
+      ON t2.geom_500m && t1.geom 
+    WHERE t1.level3_classification IN ('招商银行','浦发银行','中信银行','兴业银行','民生银行','光大银行','平安银行','华夏银行','广发银行','浙商银行','恒丰银行','渤海银行') 
+      AND t2.level3_classification = '中国银行'  
+    GROUP BY t2.org_id
+) t 
+where t.org_id = tb_selection_branch_collection_500m.org_id;
+
+--全国银行网点数
+UPDATE tb_selection_branch_collection_3km 
+SET bank_all_num = t.num - 1 
+FROM (
+    SELECT 
+        t2.org_id,
+        COUNT(1) AS num 
+    FROM tb_bank_poi t1
+    JOIN tb_bank_poi t2 
+      -- ⚡ 核心加速：利用已建空间索引的 3km 正方形面，闪电过滤出周边的全量银行点
+      ON t2.geom_3km && t1.geom 
+    WHERE t2.level3_classification = '中国银行'  
+    GROUP BY t2.org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+UPDATE tb_selection_branch_collection_1km 
+SET bank_all_num = t.num - 1 
+FROM (
+    SELECT 
+        t2.org_id,
+        COUNT(1) AS num 
+    FROM tb_bank_poi t1
+    JOIN tb_bank_poi t2 
+      -- ⚡ 核心加速：利用 1km 正方形面比对边界框
+      ON t2.geom_1km && t1.geom 
+    WHERE t2.level3_classification = '中国银行'  
+    GROUP BY t2.org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+UPDATE tb_selection_branch_collection_500m 
+SET bank_all_num = t.num - 1 
+FROM (
+    SELECT 
+        t2.org_id,
+        COUNT(1) AS num 
+    FROM tb_bank_poi t1
+    JOIN tb_bank_poi t2 
+      -- ⚡ 核心加速：利用 500m 正方形面比对边界框
+      ON t2.geom_500m && t1.geom 
+    WHERE t2.level3_classification = '中国银行'  
+    GROUP BY t2.org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+--中行app用户占比
+UPDATE tb_selection_branch_collection_3km 
+SET debit_card_bc_work = avg_num-- ⚡ 自动处理 NULL 值为 0，请检查字段名是否叫 debit_card_bc_work
+FROM (
+    SELECT 
+        -- ⚡ 核心提速与防错：使用 NULLIF 完美替代 CASE WHEN，并保留小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN debit_card_bc_proportion = 0 THEN 0::NUMERIC 
+                ELSE (tgfa.debit_card_bc::NUMERIC / debit_card_bc_proportion) 
+            END AS total,
+            tgfa.grid_id, 
+            tgfa.debit_card_bc AS num 
+        FROM tb_grid_finance_app tgfa
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    JOIN tb_grid_bank_poi_3km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+
+UPDATE tb_selection_branch_collection_3km 
+SET debit_card_bc_home = avg_num-- ⚡ 修正目标字段，避免覆盖 WORK 的数据
+FROM (
+    SELECT 
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN debit_card_bc_proportion = 0 THEN 0::NUMERIC 
+                ELSE (tgfa.debit_card_bc::NUMERIC / debit_card_bc_proportion) 
+            END AS total,
+            tgfa.grid_id, 
+            tgfa.debit_card_bc AS num 
+        FROM tb_grid_finance_app tgfa
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    JOIN tb_grid_bank_poi_3km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+UPDATE tb_selection_branch_collection_1km 
+SET debit_card_bc_work = avg_num -- 👈 请检查 1km 表对应的字段名
+FROM (
+    SELECT 
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN debit_card_bc_proportion = 0 THEN 0::NUMERIC 
+                ELSE (tgfa.debit_card_bc::NUMERIC / debit_card_bc_proportion) 
+            END AS total,
+            tgfa.grid_id, 
+            tgfa.debit_card_bc AS num 
+        FROM tb_grid_finance_app tgfa 
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    JOIN tb_grid_bank_poi_1km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+
+
+UPDATE tb_selection_branch_collection_1km 
+SET debit_card_bc_home = avg_num -- ⚡ 修正目标字段为 _home
+FROM (
+    SELECT 
+        -- ⚡ 核心修复：使用 NULLIF 防止分母为 0 崩溃，并转为 ::NUMERIC 保留小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN debit_card_bc_proportion = 0 THEN 0::NUMERIC 
+                ELSE (tgfa.debit_card_bc::NUMERIC / debit_card_bc_proportion) 
+            END AS total,
+            tgfa.grid_id, 
+            tgfa.debit_card_bc AS num 
+        FROM tb_grid_finance_app tgfa 
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    JOIN tb_grid_bank_poi_1km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+
+UPDATE tb_selection_branch_collection_500m 
+SET debit_card_bc_work = avg_num -- ⚡ 修正目标字段为 _work
+FROM (
+    SELECT 
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN debit_card_bc_proportion = 0 THEN 0::NUMERIC 
+                ELSE (tgfa.debit_card_bc::NUMERIC / debit_card_bc_proportion) 
+            END AS total,
+            tgfa.grid_id, 
+            tgfa.debit_card_bc AS num 
+        FROM tb_grid_finance_app tgfa 
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    JOIN tb_grid_bank_poi_500m tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+UPDATE tb_selection_branch_collection_500m 
+SET debit_card_bc_home = avg_num -- ⚡ 修正目标字段为 _home
+FROM (
+    SELECT 
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN debit_card_bc_proportion = 0 THEN 0::NUMERIC 
+                ELSE (tgfa.debit_card_bc::NUMERIC / debit_card_bc_proportion) 
+            END AS total,
+            tgfa.grid_id, 
+            tgfa.debit_card_bc AS num 
+        FROM tb_grid_finance_app tgfa 
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    JOIN tb_grid_bank_poi_500m tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+
+--国有竞品APP用户占比
+
+UPDATE tb_selection_branch_collection_3km 
+SET debit_card_state_owned_work = avg_num -- ⚡ 修正目标字段为 _work
+FROM (
+    SELECT 
+        -- ⚡ 核心修复：使用 NULLIF 防止分母为 0 崩溃，并转为 ::NUMERIC 保留小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN debit_card_bc_proportion = 0 THEN 0::NUMERIC 
+                ELSE (tgfa.debit_card_bc::NUMERIC / debit_card_bc_proportion) 
+            END AS total,
+            tgfa.grid_id, 
+            (tgfa.debit_card_abc + tgfa.debit_card_icbc + tgfa.debit_card_cbc + tgfa.debit_card_bocom + tgfa.debit_card_psbc) AS num 
+        FROM tb_grid_finance_app tgfa
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    JOIN tb_grid_bank_poi_3km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+
+UPDATE tb_selection_branch_collection_3km 
+SET debit_card_state_owned_home = avg_num -- ⚡ 修正目标字段为 _home，防止覆盖 WORK 结果
+FROM (
+    SELECT 
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN debit_card_bc_proportion = 0 THEN 0::NUMERIC 
+                ELSE (tgfa.debit_card_bc::NUMERIC / debit_card_bc_proportion) 
+            END AS total,
+            tgfa.grid_id, 
+            (tgfa.debit_card_abc + tgfa.debit_card_icbc + tgfa.debit_card_cbc + tgfa.debit_card_bocom + tgfa.debit_card_psbc) AS num 
+        FROM tb_grid_finance_app tgfa
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    JOIN tb_grid_bank_poi_3km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+UPDATE tb_selection_branch_collection_1km 
+SET debit_card_state_owned_work = avg_num -- ⚡ 修正目标字段为 _work
+FROM (
+    SELECT 
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN debit_card_bc_proportion = 0 THEN 0::NUMERIC 
+                ELSE (tgfa.debit_card_bc::NUMERIC / debit_card_bc_proportion) 
+            END AS total,
+            tgfa.grid_id, 
+            (tgfa.debit_card_abc + tgfa.debit_card_icbc + tgfa.debit_card_cbc + tgfa.debit_card_bocom + tgfa.debit_card_psbc) AS num 
+        FROM tb_grid_finance_app tgfa 
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    JOIN tb_grid_bank_poi_1km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+UPDATE tb_selection_branch_collection_1km 
+SET debit_card_state_owned_home = avg_num -- ⚡ 修正目标字段为 _home
+FROM (
+    SELECT 
+        -- ⚡ 核心修复：使用 NULLIF 防止分母为 0 崩溃，并转为 ::NUMERIC 保留小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN debit_card_bc_proportion = 0 THEN 0::NUMERIC 
+                ELSE (tgfa.debit_card_bc::NUMERIC / debit_card_bc_proportion) 
+            END AS total,
+            tgfa.grid_id, 
+            (tgfa.debit_card_abc + tgfa.debit_card_icbc + tgfa.debit_card_cbc + tgfa.debit_card_bocom + tgfa.debit_card_psbc) AS num 
+        FROM tb_grid_finance_app tgfa 
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    JOIN tb_grid_bank_poi_1km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+
+
+UPDATE tb_selection_branch_collection_500m 
+SET debit_card_state_owned_work = avg_num -- ⚡ 修正目标字段为 _work
+FROM (
+    SELECT 
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN debit_card_bc_proportion = 0 THEN 0::NUMERIC 
+                ELSE (tgfa.debit_card_bc::NUMERIC / debit_card_bc_proportion) 
+            END AS total,
+            tgfa.grid_id, 
+            (tgfa.debit_card_abc + tgfa.debit_card_icbc + tgfa.debit_card_cbc + tgfa.debit_card_bocom + tgfa.debit_card_psbc) AS num 
+        FROM tb_grid_finance_app tgfa 
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    JOIN tb_grid_bank_poi_500m tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+UPDATE tb_selection_branch_collection_500m 
+SET debit_card_state_owned_home = avg_num -- ⚡ 修正目标字段为 _home
+FROM (
+    SELECT 
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN debit_card_bc_proportion = 0 THEN 0::NUMERIC 
+                ELSE (tgfa.debit_card_bc::NUMERIC / debit_card_bc_proportion) 
+            END AS total,
+            tgfa.grid_id, 
+            (tgfa.debit_card_abc + tgfa.debit_card_icbc + tgfa.debit_card_cbc + tgfa.debit_card_bocom + tgfa.debit_card_psbc) AS num 
+        FROM tb_grid_finance_app tgfa 
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    JOIN tb_grid_bank_poi_500m tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+--全国性股份制APP用户占比
+
+UPDATE tb_selection_branch_collection_3km 
+SET debit_card_joint_stock_work = avg_num -- ⚡ 修正目标字段为 _work
+FROM (
+    SELECT
+        -- ⚡ 核心修复：使用 NULLIF 防止分母为 0 崩溃，并转为 ::NUMERIC 保留小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN debit_card_bc_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.debit_card_bc::NUMERIC / debit_card_bc_proportion)
+            END AS total,
+            tgfa.grid_id,
+            (tgfa.debit_card_cmbc + tgfa.debit_card_spdb + tgfa.debit_card_cib + tgfa.debit_card_cmb + tgfa.debit_card_pab + tgfa.debit_card_ccb + tgfa.debit_card_ceb + tgfa.debit_card_hxb) AS num
+        FROM tb_grid_finance_app tgfa
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    JOIN tb_grid_bank_poi_3km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+
+UPDATE tb_selection_branch_collection_3km
+SET debit_card_joint_stock_home = avg_num -- ⚡ 修正目标字段为 _home，防止覆盖 WORK 结果
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN debit_card_bc_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.debit_card_bc::NUMERIC / debit_card_bc_proportion)
+            END AS total,
+            tgfa.grid_id,
+            (tgfa.debit_card_cmbc + tgfa.debit_card_spdb + tgfa.debit_card_cib + tgfa.debit_card_cmb + tgfa.debit_card_pab + tgfa.debit_card_ccb + tgfa.debit_card_ceb + tgfa.debit_card_hxb) AS num
+        FROM tb_grid_finance_app tgfa
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    JOIN tb_grid_bank_poi_3km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+UPDATE tb_selection_branch_collection_1km
+SET debit_card_joint_stock_work = avg_num -- ⚡ 修正目标字段为 _work
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN debit_card_bc_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.debit_card_bc::NUMERIC / debit_card_bc_proportion)
+            END AS total,
+            tgfa.grid_id,
+            (tgfa.debit_card_cmbc + tgfa.debit_card_spdb + tgfa.debit_card_cib + tgfa.debit_card_cmb + tgfa.debit_card_pab + tgfa.debit_card_ccb + tgfa.debit_card_ceb + tgfa.debit_card_hxb) AS num
+        FROM tb_grid_finance_app tgfa
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    JOIN tb_grid_bank_poi_1km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+
+UPDATE tb_selection_branch_collection_1km
+SET debit_card_joint_stock_home = avg_num -- ⚡ 修正目标字段为 _home
+FROM (
+    SELECT
+        -- ⚡ 核心修复：使用 NULLIF 防止分母为 0 崩溃，并转为 ::NUMERIC 保留小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN debit_card_bc_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.debit_card_bc::NUMERIC / debit_card_bc_proportion)
+            END AS total,
+            tgfa.grid_id,
+            (tgfa.debit_card_cmbc + tgfa.debit_card_spdb + tgfa.debit_card_cib + tgfa.debit_card_cmb + tgfa.debit_card_pab + tgfa.debit_card_ccb + tgfa.debit_card_ceb + tgfa.debit_card_hxb) AS num
+        FROM tb_grid_finance_app tgfa
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    JOIN tb_grid_bank_poi_1km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+
+
+UPDATE tb_selection_branch_collection_500m
+SET debit_card_joint_stock_work = avg_num -- ⚡ 修正目标字段为 _work
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN debit_card_bc_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.debit_card_bc::NUMERIC / debit_card_bc_proportion)
+            END AS total,
+            tgfa.grid_id,
+            (tgfa.debit_card_cmbc + tgfa.debit_card_spdb + tgfa.debit_card_cib + tgfa.debit_card_cmb + tgfa.debit_card_pab + tgfa.debit_card_ccb + tgfa.debit_card_ceb + tgfa.debit_card_hxb) AS num
+        FROM tb_grid_finance_app tgfa
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    JOIN tb_grid_bank_poi_500m tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+
+UPDATE tb_selection_branch_collection_500m
+SET debit_card_joint_stock_home = avg_num -- ⚡ 修正目标字段为 _home
+FROM (
+    SELECT 
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN debit_card_bc_proportion = 0 THEN 0::NUMERIC 
+                ELSE (tgfa.debit_card_bc::NUMERIC / debit_card_bc_proportion) 
+            END AS total,
+            tgfa.grid_id, 
+            (tgfa.debit_card_cmbc + tgfa.debit_card_spdb + tgfa.debit_card_cib + tgfa.debit_card_cmb + tgfa.debit_card_pab + tgfa.debit_card_ccb + tgfa.debit_card_ceb + tgfa.debit_card_hxb) AS num 
+        FROM tb_grid_finance_app tgfa 
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    JOIN tb_grid_bank_poi_500m tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+--金融APP用户占比
+UPDATE tb_selection_branch_collection_3km 
+SET debit_card_finance_app_work = avg_num -- ⚡ 修正目标字段为 _work
+FROM (
+    SELECT
+        -- ⚡ 核心修复：使用 NULLIF 防止分母为 0 崩溃，并转为 ::NUMERIC 保留小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            (gender_female + gender_male) AS total,
+            tgbp.grid_id,
+            CASE
+                WHEN debit_card_bc_proportion = 0 THEN 0::NUMERIC
+                -- ⚡ 核心修复：单行相除转为 NUMERIC，防止整数除法被截断
+                ELSE (tgfa.debit_card_bc::NUMERIC / debit_card_bc_proportion)
+            END AS num
+        FROM tb_grid_pop_attr1 tgbp
+        JOIN tb_grid_finance_app tgfa ON tgbp.grid_id = tgfa.grid_id
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    JOIN tb_grid_bank_poi_3km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+UPDATE tb_selection_branch_collection_3km
+SET debit_card_finance_app_home = avg_num -- ⚡ 修正目标字段为 _home，防止覆盖 WORK 结果
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            (gender_female + gender_male) AS total,
+            tgbp.grid_id,
+            CASE
+                WHEN debit_card_bc_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.debit_card_bc::NUMERIC / debit_card_bc_proportion)
+            END AS num
+        FROM tb_grid_pop_attr1 tgbp
+        JOIN tb_grid_finance_app tgfa ON tgbp.grid_id = tgfa.grid_id
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    JOIN tb_grid_bank_poi_3km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+UPDATE tb_selection_branch_collection_1km
+SET debit_card_finance_app_work = avg_num -- ⚡ 修正目标字段为 _work
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            (gender_female + gender_male) AS total,
+            tgbp.grid_id,
+            CASE
+                WHEN debit_card_bc_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.debit_card_bc::NUMERIC / debit_card_bc_proportion)
+            END AS num
+        FROM tb_grid_pop_attr1 tgbp
+        JOIN tb_grid_finance_app tgfa ON tgbp.grid_id = tgfa.grid_id
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    JOIN tb_grid_bank_poi_1km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+UPDATE tb_selection_branch_collection_1km
+SET debit_card_finance_app_home = avg_num -- ⚡ 修正目标字段为 _home
+FROM (
+    SELECT
+        -- ⚡ 核心修复：使用 NULLIF 防止分母为 0 崩溃，并转为 ::NUMERIC 保留小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            (gender_female + gender_male) AS total,
+            tgbp.grid_id,
+            CASE
+                WHEN debit_card_bc_proportion = 0 THEN 0::NUMERIC
+                -- ⚡ 核心修复：单行相除转为 NUMERIC，防止整数除法被截断
+                ELSE (tgfa.debit_card_bc::NUMERIC / debit_card_bc_proportion)
+            END AS num
+        FROM tb_grid_pop_attr1 tgbp
+        JOIN tb_grid_finance_app tgfa ON tgbp.grid_id = tgfa.grid_id
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    JOIN tb_grid_bank_poi_1km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+UPDATE tb_selection_branch_collection_500m
+SET debit_card_finance_app_work = avg_num -- ⚡ 修正目标字段为 _work
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            (gender_female + gender_male) AS total,
+            tgbp.grid_id,
+            CASE
+                WHEN debit_card_bc_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.debit_card_bc::NUMERIC / debit_card_bc_proportion)
+            END AS num
+        FROM tb_grid_pop_attr1 tgbp
+        JOIN tb_grid_finance_app tgfa ON tgbp.grid_id = tgfa.grid_id
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    JOIN tb_grid_bank_poi_500m tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+UPDATE tb_selection_branch_collection_500m
+SET debit_card_finance_app_home = avg_num -- ⚡ 修正目标字段为 _home
+FROM (
+    SELECT 
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            (gender_female + gender_male) AS total,
+            tgbp.grid_id, 
+            CASE 
+                WHEN debit_card_bc_proportion = 0 THEN 0::NUMERIC 
+                ELSE (tgfa.debit_card_bc::NUMERIC / debit_card_bc_proportion) 
+            END AS num 
+        FROM tb_grid_pop_attr1 tgbp
+        JOIN tb_grid_finance_app tgfa ON tgbp.grid_id = tgfa.grid_id
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    JOIN tb_grid_bank_poi_500m tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+
+--购物中心个数
+
+update tb_selection_branch_collection_3km  set mall_num =  ta.num from (select t.org_id,sum(num) num from tb_grid_bank_poi_3km t 
+left join tb_grid_geo_loc loc on t.grid_id = loc.grid_id where loc.level2_classification = '购物中心'  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_3km.org_id ;
+
+update tb_selection_branch_collection_1km  set mall_num =  ta.num from (select t.org_id,sum(num) num from tb_grid_bank_poi_1km t 
+left join tb_grid_geo_loc loc on t.grid_id = loc.grid_id where loc.level2_classification = '购物中心'  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_1km.org_id ;
+
+update tb_selection_branch_collection_500m  set mall_num =  ta.num from (select t.org_id,sum(num) num from tb_grid_bank_poi_500m t 
+left join tb_grid_geo_loc loc on t.grid_id = loc.grid_id where loc.level2_classification = '购物中心'  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_500m.org_id ;
+
+--超市个数
+
+update tb_selection_branch_collection_3km  set shop_num =  ta.num from (select t.org_id,sum(num) num from tb_grid_bank_poi_3km t 
+left join tb_grid_geo_loc loc on t.grid_id = loc.grid_id where loc.level2_classification in ('超市','便利超市','大卖场')   group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_3km.org_id ;
+
+update tb_selection_branch_collection_1km  set shop_num =  ta.num from (select t.org_id,sum(num) num from tb_grid_bank_poi_1km t 
+left join tb_grid_geo_loc loc on t.grid_id = loc.grid_id where loc.level2_classification in ('超市','便利超市','大卖场')   group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_1km.org_id ;
+
+update tb_selection_branch_collection_500m  set shop_num =  ta.num from (select t.org_id,sum(num) num from tb_grid_bank_poi_500m t 
+left join tb_grid_geo_loc loc on t.grid_id = loc.grid_id where loc.level2_classification in ('超市','便利超市','大卖场')   group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_500m.org_id ;
+
+
+--小区数
+
+
+update tb_selection_branch_collection_3km  set residential_num =  ta.num from (select t.org_id,sum(num) num from tb_grid_bank_poi_3km t 
+left join tb_grid_geo_loc loc on t.grid_id = loc.grid_id where loc.level2_classification = '住宅区'  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_3km.org_id ;
+
+update tb_selection_branch_collection_1km  set residential_num =  ta.num from (select t.org_id,sum(num) num from tb_grid_bank_poi_1km t 
+left join tb_grid_geo_loc loc on t.grid_id = loc.grid_id where loc.level2_classification = '住宅区'  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_1km.org_id ;
+
+update tb_selection_branch_collection_500m  set residential_num =  ta.num from (select t.org_id,sum(num) num from tb_grid_bank_poi_500m t 
+left join tb_grid_geo_loc loc on t.grid_id = loc.grid_id where loc.level2_classification = '住宅区'  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_500m.org_id ;
+
+--公司数
+
+update tb_selection_branch_collection_3km  set company_num =  ta.num from (select t.org_id,sum(num) num from tb_grid_bank_poi_3km t 
+left join tb_grid_geo_loc loc on t.grid_id = loc.grid_id where loc.level2_classification = '公司'  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_3km.org_id ;
+
+update tb_selection_branch_collection_1km  set company_num =  ta.num from (select t.org_id,sum(num) num from tb_grid_bank_poi_1km t 
+left join tb_grid_geo_loc loc on t.grid_id = loc.grid_id where loc.level2_classification = '公司'  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_1km.org_id ;
+
+update tb_selection_branch_collection_500m  set company_num =  ta.num from (select t.org_id,sum(num) num from tb_grid_bank_poi_500m t 
+left join tb_grid_geo_loc loc on t.grid_id = loc.grid_id where loc.level2_classification = '公司'  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_500m.org_id ;
+
+
+--行政单位数
+
+update tb_selection_branch_collection_3km  set district_num =  ta.num from (select t.org_id,sum(num) num from tb_grid_bank_poi_3km t 
+left join tb_grid_geo_loc loc on t.grid_id = loc.grid_id where loc.level1_classification = '政府机构'  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_3km.org_id ;
+
+update tb_selection_branch_collection_1km  set district_num =  ta.num from (select t.org_id,sum(num) num from tb_grid_bank_poi_1km t 
+left join tb_grid_geo_loc loc on t.grid_id = loc.grid_id where loc.level1_classification = '政府机构'  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_1km.org_id ;
+
+update tb_selection_branch_collection_500m  set district_num =  ta.num from (select t.org_id,sum(num) num from tb_grid_bank_poi_500m t 
+left join tb_grid_geo_loc loc on t.grid_id = loc.grid_id where loc.level1_classification = '政府机构'  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_500m.org_id ;
+
+
+--高校数
+
+update tb_selection_branch_collection_3km  set high_school_num =  ta.num from (select t.org_id,sum(num) num from tb_grid_bank_poi_3km t 
+left join tb_grid_geo_loc loc on t.grid_id = loc.grid_id where loc.level2_classification in ('中学','高等院校','成人教育')  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_3km.org_id ;
+
+update tb_selection_branch_collection_1km  set high_school_num =  ta.num from (select t.org_id,sum(num) num from tb_grid_bank_poi_1km t 
+left join tb_grid_geo_loc loc on t.grid_id = loc.grid_id where loc.level2_classification in ('中学','高等院校','成人教育')  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_1km.org_id ;
+
+update tb_selection_branch_collection_500m  set high_school_num =  ta.num from (select t.org_id,sum(num) num from tb_grid_bank_poi_500m t 
+left join tb_grid_geo_loc loc on t.grid_id = loc.grid_id where loc.level2_classification in ('中学','高等院校','成人教育')  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_500m.org_id ;
+
+
+--医院数
+
+update tb_selection_branch_collection_3km  set hospital_num =  ta.num from (select t.org_id,sum(num) num from tb_grid_bank_poi_3km t 
+left join tb_grid_geo_loc loc on t.grid_id = loc.grid_id where loc.level2_classification = '医院'  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_3km.org_id ;
+
+update tb_selection_branch_collection_1km  set hospital_num =  ta.num from (select t.org_id,sum(num) num from tb_grid_bank_poi_1km t 
+left join tb_grid_geo_loc loc on t.grid_id = loc.grid_id where loc.level2_classification = '医院'  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_1km.org_id ;
+
+update tb_selection_branch_collection_500m  set hospital_num =  ta.num from (select t.org_id,sum(num) num from tb_grid_bank_poi_500m t 
+left join tb_grid_geo_loc loc on t.grid_id = loc.grid_id where loc.level2_classification = '医院'  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_500m.org_id ;
+
+
+--平均房价比
+update tb_selection_branch_collection_3km  set average_house_price =  ta.num/(select avg(average_house_price) num from tb_grid_land_value) from (select t.org_id,avg(average_house_price) num 
+from tb_grid_bank_poi_3km t 
+left join tb_grid_land_value loc on t.grid_id = loc.grid_id  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_3km.org_id ;
+
+update tb_selection_branch_collection_1km  set average_house_price =  ta.num/(select avg(average_house_price) num from tb_grid_land_value) from (select t.org_id,avg(average_house_price) num 
+from tb_grid_bank_poi_1km t 
+left join tb_grid_land_value loc on t.grid_id = loc.grid_id  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_1km.org_id ;
+
+update tb_selection_branch_collection_500m  set average_house_price =  ta.num/(select avg(average_house_price) num from tb_grid_land_value) from (select t.org_id,avg(average_house_price) num 
+from tb_grid_bank_poi_500m t 
+left join tb_grid_land_value loc on t.grid_id = loc.grid_id  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_500m.org_id ;
+
+--平均房租比
+update tb_selection_branch_collection_3km  set average_rent =  ta.num/(select avg(average_rent) num from tb_grid_land_value) from (select t.org_id,avg(average_rent) num 
+from tb_grid_bank_poi_3km t 
+left join tb_grid_land_value loc on t.grid_id = loc.grid_id  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_3km.org_id ;
+
+update tb_selection_branch_collection_1km  set average_rent =  ta.num/(select avg(average_rent) num from tb_grid_land_value) from (select t.org_id,avg(average_rent) num 
+from tb_grid_bank_poi_1km t 
+left join tb_grid_land_value loc on t.grid_id = loc.grid_id  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_1km.org_id ;
+
+update tb_selection_branch_collection_500m  set average_rent =  ta.num/(select avg(average_rent) num from tb_grid_land_value) from (select t.org_id,avg(average_rent) num 
+from tb_grid_bank_poi_500m t 
+left join tb_grid_land_value loc on t.grid_id = loc.grid_id  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_500m.org_id ;
+
+--公交数
+
+update tb_selection_branch_collection_3km  set bus_station_num =  ta.num from (select t.org_id,sum(num) num from tb_grid_bank_poi_3km t 
+left join tb_grid_geo_loc loc on t.grid_id = loc.grid_id where loc.level2_classification = '公交站'  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_3km.org_id ;
+
+update tb_selection_branch_collection_1km  set bus_station_num =  ta.num from (select t.org_id,sum(num) num from tb_grid_bank_poi_1km t 
+left join tb_grid_geo_loc loc on t.grid_id = loc.grid_id where loc.level2_classification = '公交站'  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_1km.org_id ;
+
+update tb_selection_branch_collection_500m  set bus_station_num =  ta.num from (select t.org_id,sum(num) num from tb_grid_bank_poi_500m t 
+left join tb_grid_geo_loc loc on t.grid_id = loc.grid_id where loc.level2_classification = '公交站'  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_500m.org_id ;
+
+
+--停车场
+
+update tb_selection_branch_collection_3km  set parking_num =  ta.num from (select t.org_id,sum(num) num from tb_grid_bank_poi_3km t 
+left join tb_grid_geo_loc loc on t.grid_id = loc.grid_id where loc.level2_classification = '停车场'  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_3km.org_id ;
+
+update tb_selection_branch_collection_1km  set parking_num =  ta.num from (select t.org_id,sum(num) num from tb_grid_bank_poi_1km t 
+left join tb_grid_geo_loc loc on t.grid_id = loc.grid_id where loc.level2_classification = '停车场'  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_1km.org_id ;
+
+update tb_selection_branch_collection_500m  set parking_num =  ta.num from (select t.org_id,sum(num) num from tb_grid_bank_poi_500m t 
+left join tb_grid_geo_loc loc on t.grid_id = loc.grid_id where loc.level2_classification = '停车场'  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_500m.org_id ;
+
+--地铁站
+
+update tb_selection_branch_collection_3km  set subway_num =  ta.num from (select t.org_id,sum(num) num from tb_grid_bank_poi_3km t 
+left join tb_grid_geo_loc loc on t.grid_id = loc.grid_id where loc.level2_classification = '地铁站'  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_3km.org_id ;
+
+update tb_selection_branch_collection_1km  set subway_num =  ta.num from (select t.org_id,sum(num) num from tb_grid_bank_poi_1km t 
+left join tb_grid_geo_loc loc on t.grid_id = loc.grid_id where loc.level2_classification = '地铁站'  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_1km.org_id ;
+
+update tb_selection_branch_collection_500m  set subway_num =  ta.num from (select t.org_id,sum(num) num from tb_grid_bank_poi_500m t 
+left join tb_grid_geo_loc loc on t.grid_id = loc.grid_id where loc.level2_classification = '地铁站'  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_500m.org_id ;
+
+--殡葬/陵园
+
+update tb_selection_branch_collection_3km  set gemetery_num =  ta.num from (select t.org_id,count(1) num from tb_bank_poi t 
+left join tb_poi loc on st_dwithin(t.geom::geography,loc.geom::geography,3000) where loc.show_tag = '公墓'  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_3km.org_id ;
+
+update tb_selection_branch_collection_1km  set gemetery_num =  ta.num from (select t.org_id,count(1) num from tb_bank_poi t 
+left join tb_poi loc on st_dwithin(t.geom::geography,loc.geom::geography,1000) where loc.show_tag = '公墓'  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_1km.org_id ;
+
+update tb_selection_branch_collection_500m  set gemetery_num =  ta.num from (select t.org_id,count(1) num from tb_bank_poi t 
+left join tb_poi loc on st_dwithin(t.geom::geography,loc.geom::geography,500) where loc.show_tag = '公墓'  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_500m.org_id ;
+
+
+
+--更新万马奔腾的数据
+update tb_selection_branch_collection_3km set score_202512 = t.score_202512,score_202601  = t.score_202601 , score_202603  = t.score_202603,
+person_202512  = t.person_202512 ,person_202601  = t.person_202601 ,person_202603  = t.person_202603 ,create_time  = t.create_time,
+person_score_202512 =t.person_score_202512 ,person_score_202601 =t.person_score_202601 ,person_score_202603 =t.person_score_202603 
+from tb_score_bank t where tb_selection_branch_collection_3km.org_id = t.org_no ;
+
+update tb_selection_branch_collection_1km set score_202512 = t.score_202512,score_202601  = t.score_202601 , score_202603  = t.score_202603,
+person_202512  = t.person_202512 ,person_202601  = t.person_202601 ,person_202603  = t.person_202603 ,create_time  = t.create_time ,
+person_score_202512 =t.person_score_202512 ,person_score_202601 =t.person_score_202601 ,person_score_202603 =t.person_score_202603 
+from tb_score_bank t where tb_selection_branch_collection_1km.org_id = t.org_no ;
+
+update tb_selection_branch_collection_500m set score_202512 = t.score_202512,score_202601  = t.score_202601 , score_202603  = t.score_202603,
+person_202512  = t.person_202512 ,person_202601  = t.person_202601 ,person_202603  = t.person_202603 ,create_time  = t.create_time ,
+person_score_202512 =t.person_score_202512 ,person_score_202601 =t.person_score_202601 ,person_score_202603 =t.person_score_202603 
+from tb_score_bank t where tb_selection_branch_collection_500m.org_id = t.org_no ;
+
+-- 食物消费人数的数据
+UPDATE tb_selection_branch_collection_3km 
+SET population_profile_food_work = avg_num
+FROM (
+    SELECT
+        -- ⚡ 核心修复：外层进行聚合，并使用 NULLIF 防止分母为 0 崩溃
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            t.org_id,
+            CASE
+                WHEN tgcp.food_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgcp.food::NUMERIC / tgcp.food_proportion)
+            END AS total, -- 反推该网格的总人口
+            tgcp.food AS num  -- 餐饮偏好人口
+        FROM tb_grid_bank_poi_3km t
+        -- ⚡ 核心修复：改用 JOIN 确保过滤条件 tgcp.population_type 正确生效
+        JOIN tb_grid_consumption_perference tgcp ON t.grid_id = tgcp.grid_id
+        WHERE tgcp.population_type = 'WORK'
+    ) sub
+    GROUP BY org_id -- ⚡ 核心修复：必须按机构号分组
+) ta
+WHERE ta.org_id = tb_selection_branch_collection_3km.org_id;
+
+UPDATE tb_selection_branch_collection_3km
+SET population_profile_food_home = avg_num
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            t.org_id,
+            CASE
+                WHEN tgcp.food_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgcp.food::NUMERIC / tgcp.food_proportion)
+            END AS total,
+            tgcp.food AS num
+        FROM tb_grid_bank_poi_3km t
+        JOIN tb_grid_consumption_perference tgcp ON t.grid_id = tgcp.grid_id
+        WHERE tgcp.population_type = 'HOME'
+    ) sub
+    GROUP BY org_id
+) ta
+WHERE ta.org_id = tb_selection_branch_collection_3km.org_id;
+
+UPDATE tb_selection_branch_collection_1km
+SET population_profile_food_work = avg_num
+FROM (
+    SELECT
+        -- ⚡ 核心修复：按 org_id 进行聚合，并转为 ::NUMERIC 保留小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            t.org_id,
+            CASE
+                WHEN tgcp.food_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgcp.food::NUMERIC / tgcp.food_proportion)
+            END AS total, -- 反推单个网格的总人口
+            tgcp.food AS num  -- 餐饮偏好人口
+        FROM tb_grid_bank_poi_1km t
+        JOIN tb_grid_consumption_perference tgcp ON t.grid_id = tgcp.grid_id
+        WHERE tgcp.population_type = 'WORK'
+    ) sub
+    GROUP BY org_id -- ⚡ 核心修复：必须按机构号分组
+) ta
+WHERE ta.org_id = tb_selection_branch_collection_1km.org_id;
+
+UPDATE tb_selection_branch_collection_1km
+SET population_profile_food_home = avg_num
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            t.org_id,
+            CASE
+                WHEN tgcp.food_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgcp.food::NUMERIC / tgcp.food_proportion)
+            END AS total,
+            tgcp.food AS num
+        FROM tb_grid_bank_poi_1km t
+        JOIN tb_grid_consumption_perference tgcp ON t.grid_id = tgcp.grid_id
+        WHERE tgcp.population_type = 'HOME'
+    ) sub
+    GROUP BY org_id
+) ta
+WHERE ta.org_id = tb_selection_branch_collection_1km.org_id;
+
+
+UPDATE tb_selection_branch_collection_500m
+SET population_profile_food_work = avg_num
+FROM (
+    SELECT
+        -- ⚡ 核心修复：按 org_id 进行聚合，并转为 ::NUMERIC 保留小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            t.org_id,
+            CASE
+                WHEN tgcp.food_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgcp.food::NUMERIC / tgcp.food_proportion)
+            END AS total, -- 反推单个网格的总人口
+            tgcp.food AS num  -- 餐饮偏好人口
+        FROM tb_grid_bank_poi_500m t
+        JOIN tb_grid_consumption_perference tgcp ON t.grid_id = tgcp.grid_id
+        WHERE tgcp.population_type = 'WORK'
+    ) sub
+    GROUP BY org_id -- ⚡ 核心修复：必须按机构号分组
+) ta
+WHERE ta.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+UPDATE tb_selection_branch_collection_500m
+SET population_profile_food_home = avg_num
+FROM (
+    SELECT 
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            t.org_id,
+            CASE 
+                WHEN tgcp.food_proportion = 0 THEN 0::NUMERIC 
+                ELSE (tgcp.food::NUMERIC / tgcp.food_proportion) 
+            END AS total,
+            tgcp.food AS num 
+        FROM tb_grid_bank_poi_500m t
+        JOIN tb_grid_consumption_perference tgcp ON t.grid_id = tgcp.grid_id 
+        WHERE tgcp.population_type = 'HOME'
+    ) sub
+    GROUP BY org_id
+) ta 
+WHERE ta.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+--餐厅消费人数
+UPDATE tb_selection_branch_collection_3km 
+SET population_profile_life_services_work = avg_num
+FROM (
+    SELECT
+        -- ⚡ 核心修复：外层进行聚合，并使用 NULLIF 防止分母为 0 崩溃，转为 ::NUMERIC 保留小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            t.org_id,
+            CASE
+                WHEN tgcp.life_services_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgcp.life_services::NUMERIC / tgcp.life_services_proportion)
+            END AS total, -- 反推单个网格的总人口
+            tgcp.life_services AS num  -- 生活服务偏好人口
+        FROM tb_grid_bank_poi_3km t
+        JOIN tb_grid_consumption_perference tgcp ON t.grid_id = tgcp.grid_id
+        WHERE tgcp.population_type = 'WORK'
+    ) sub
+    GROUP BY org_id -- ⚡ 核心修复：必须按机构号分组
+) ta
+WHERE ta.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+UPDATE tb_selection_branch_collection_3km
+SET population_profile_life_services_home = avg_num
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            t.org_id,
+            CASE
+                WHEN tgcp.life_services_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgcp.life_services::NUMERIC / tgcp.life_services_proportion)
+            END AS total,
+            tgcp.life_services AS num
+        FROM tb_grid_bank_poi_3km t
+        JOIN tb_grid_consumption_perference tgcp ON t.grid_id = tgcp.grid_id
+        WHERE tgcp.population_type = 'HOME'
+    ) sub
+    GROUP BY org_id
+) ta
+WHERE ta.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+UPDATE tb_selection_branch_collection_1km
+SET population_profile_life_services_work = avg_num
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            t.org_id,
+            CASE
+                WHEN tgcp.life_services_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgcp.life_services::NUMERIC / tgcp.life_services_proportion)
+            END AS total,
+            tgcp.life_services AS num
+        FROM tb_grid_bank_poi_1km t
+        JOIN tb_grid_consumption_perference tgcp ON t.grid_id = tgcp.grid_id
+        WHERE tgcp.population_type = 'WORK'
+    ) sub
+    GROUP BY org_id
+) ta
+WHERE ta.org_id = tb_selection_branch_collection_1km.org_id;
+
+
+UPDATE tb_selection_branch_collection_1km
+SET population_profile_life_services_home = avg_num
+FROM (
+    SELECT
+        -- ⚡ 核心修复：按 org_id 进行聚合，并转为 ::NUMERIC 保留小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            t.org_id,
+            CASE
+                WHEN tgcp.life_services_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgcp.life_services::NUMERIC / tgcp.life_services_proportion)
+            END AS total, -- 反推单个网格的总人口
+            tgcp.life_services AS num  -- 生活服务偏好人口
+        FROM tb_grid_bank_poi_1km t
+        JOIN tb_grid_consumption_perference tgcp ON t.grid_id = tgcp.grid_id
+        WHERE tgcp.population_type = 'HOME'
+    ) sub
+    GROUP BY org_id -- ⚡ 核心修复：必须按机构号分组
+) ta
+WHERE ta.org_id = tb_selection_branch_collection_1km.org_id;
+
+
+UPDATE tb_selection_branch_collection_500m
+SET population_profile_life_services_work = avg_num
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            t.org_id,
+            CASE
+                WHEN tgcp.life_services_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgcp.life_services::NUMERIC / tgcp.life_services_proportion)
+            END AS total,
+            tgcp.life_services AS num
+        FROM tb_grid_bank_poi_500m t
+        JOIN tb_grid_consumption_perference tgcp ON t.grid_id = tgcp.grid_id
+        WHERE tgcp.population_type = 'WORK'
+    ) sub
+    GROUP BY org_id
+) ta
+WHERE ta.org_id = tb_selection_branch_collection_500m.org_id;
+
+UPDATE tb_selection_branch_collection_500m
+SET population_profile_life_services_home = avg_num
+FROM (
+    SELECT 
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            t.org_id,
+            CASE 
+                WHEN tgcp.life_services_proportion = 0 THEN 0::NUMERIC 
+                ELSE (tgcp.life_services::NUMERIC / tgcp.life_services_proportion) 
+            END AS total,
+            tgcp.life_services AS num 
+        FROM tb_grid_bank_poi_500m t
+        JOIN tb_grid_consumption_perference tgcp ON t.grid_id = tgcp.grid_id 
+        WHERE tgcp.population_type = 'HOME'
+    ) sub
+    GROUP BY org_id
+) ta 
+WHERE ta.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+--生产操作者占比
+UPDATE tb_selection_branch_collection_3km 
+SET population_profile_job_worker_work = avg_num
+FROM (
+    SELECT
+        -- ⚡ 核心修复：使用 NULLIF 防止分母为 0 崩溃，并转为 ::NUMERIC 保留小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN job_worker_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.job_worker::NUMERIC / job_worker_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.job_worker AS num
+        FROM tb_grid_pop_attr1 tgfa
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    JOIN tb_grid_bank_poi_3km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+UPDATE tb_selection_branch_collection_3km
+SET population_profile_job_worker_home = avg_num
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN job_worker_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.job_worker::NUMERIC / job_worker_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.job_worker AS num
+        FROM tb_grid_pop_attr1 tgfa
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    JOIN tb_grid_bank_poi_3km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+UPDATE tb_selection_branch_collection_1km
+SET population_profile_job_worker_work = avg_num
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN job_worker_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.job_worker::NUMERIC / job_worker_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.job_worker AS num
+        FROM tb_grid_pop_attr1 tgfa
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 1km 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_1km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+
+UPDATE tb_selection_branch_collection_1km
+SET population_profile_job_worker_home = avg_num
+FROM (
+    SELECT
+        -- ⚡ 核心修复：使用 NULLIF 防止分母为 0 崩溃，并转为 ::NUMERIC 保留小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN job_worker_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.job_worker::NUMERIC / job_worker_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.job_worker AS num
+        FROM tb_grid_pop_attr1 tgfa
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 1km 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_1km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+
+UPDATE tb_selection_branch_collection_500m
+SET population_profile_job_worker_work = avg_num
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN job_worker_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.job_worker::NUMERIC / job_worker_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.job_worker AS num
+        FROM tb_grid_pop_attr1 tgfa
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 500m 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_500m tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+UPDATE tb_selection_branch_collection_500m
+SET population_profile_job_worker_home = avg_num
+FROM (
+    SELECT 
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN job_worker_proportion = 0 THEN 0::NUMERIC 
+                ELSE (tgfa.job_worker::NUMERIC / job_worker_proportion) 
+            END AS total,
+            tgfa.grid_id, 
+            tgfa.job_worker AS num 
+        FROM tb_grid_pop_attr1 tgfa
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 500m 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_500m tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+
+--管理者和企业者占比
+UPDATE tb_selection_branch_collection_3km 
+SET population_profile_job_predict_manager_businss_owner_work = avg_num
+FROM (
+    SELECT
+        -- ⚡ 核心修复：使用 NULLIF 防止分母为 0 崩溃，并转为 ::NUMERIC 保留小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN job_manager_bussines_owner_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.job_manager_bussines_owner::NUMERIC / job_manager_bussines_owner_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.job_manager_bussines_owner AS num
+        FROM tb_grid_pop_attr1 tgfa
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    JOIN tb_grid_bank_poi_3km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+UPDATE tb_selection_branch_collection_3km
+SET population_profile_job_predict_manager_businss_owner_home = avg_num
+FROM (
+    SELECT
+        -- ⚡ 核心修复：使用 NULLIF 防止分母为 0 崩溃，并转为 ::NUMERIC 保留小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN job_manager_bussines_owner_proportion = 0 THEN 0::NUMERIC
+                -- ⚡ 严格对齐你提供的字段拼写 bussines
+                ELSE (tgfa.job_manager_bussines_owner::NUMERIC / job_manager_bussines_owner_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.job_manager_bussines_owner AS num
+        FROM tb_grid_pop_attr1 tgfa
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    JOIN tb_grid_bank_poi_3km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+UPDATE tb_selection_branch_collection_1km
+SET population_profile_job_predict_manager_businss_owner_work = avg_num
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN job_manager_bussines_owner_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.job_manager_bussines_owner::NUMERIC / job_manager_bussines_owner_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.job_manager_bussines_owner AS num
+        FROM tb_grid_pop_attr1 tgfa
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 1km 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_1km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+
+UPDATE tb_selection_branch_collection_1km
+SET population_profile_job_predict_manager_businss_owner_home = avg_num
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN job_manager_bussines_owner_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.job_manager_bussines_owner::NUMERIC / job_manager_bussines_owner_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.job_manager_bussines_owner AS num
+        FROM tb_grid_pop_attr1 tgfa
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 1km 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_1km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+
+UPDATE tb_selection_branch_collection_500m
+SET population_profile_job_predict_manager_businss_owner_work = avg_num
+FROM (
+    SELECT
+        -- ⚡ 核心修复：使用 NULLIF 防止分母为 0 崩溃，并转为 ::NUMERIC 保留小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN job_manager_bussines_owner_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.job_manager_bussines_owner::NUMERIC / job_manager_bussines_owner_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.job_manager_bussines_owner AS num
+        FROM tb_grid_pop_attr1 tgfa
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 500m 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_500m tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+UPDATE tb_selection_branch_collection_500m
+SET population_profile_job_predict_manager_businss_owner_home = avg_num
+FROM (
+    SELECT 
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN job_manager_bussines_owner_proportion = 0 THEN 0::NUMERIC 
+                ELSE (tgfa.job_manager_bussines_owner::NUMERIC / job_manager_bussines_owner_proportion) 
+            END AS total,
+            tgfa.grid_id, 
+            tgfa.job_manager_bussines_owner AS num 
+        FROM tb_grid_pop_attr1 tgfa
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 500m 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_500m tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+--网购能力预测占比
+UPDATE tb_selection_branch_collection_3km 
+SET population_profile_online_shopping_work = avg_num
+FROM (
+    SELECT
+        -- ⚡ 核心修复：使用 NULLIF 防止分母为 0 崩溃，并转为 ::NUMERIC 保留小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN online_shopping_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.online_shopping::NUMERIC / online_shopping_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.online_shopping AS num
+        FROM tb_grid_pop_attr1 tgfa
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    JOIN tb_grid_bank_poi_3km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+UPDATE tb_selection_branch_collection_3km
+SET population_profile_online_shopping_home = avg_num
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN online_shopping_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.online_shopping::NUMERIC / online_shopping_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.online_shopping AS num
+        FROM tb_grid_pop_attr1 tgfa
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    JOIN tb_grid_bank_poi_3km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+UPDATE tb_selection_branch_collection_1km
+SET population_profile_online_shopping_work = avg_num
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN online_shopping_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.online_shopping::NUMERIC / online_shopping_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.online_shopping AS num
+        FROM tb_grid_pop_attr1 tgfa
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 1km 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_1km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+
+UPDATE tb_selection_branch_collection_1km
+SET population_profile_online_shopping_home = avg_num
+FROM (
+    SELECT
+        -- ⚡ 核心修复：使用 NULLIF 防止分母为 0 崩溃，并转为 ::NUMERIC 保留小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN online_shopping_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.online_shopping::NUMERIC / online_shopping_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.online_shopping AS num
+        FROM tb_grid_pop_attr1 tgfa
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 1km 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_1km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+
+UPDATE tb_selection_branch_collection_500m
+SET population_profile_online_shopping_work = avg_num
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN online_shopping_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.online_shopping::NUMERIC / online_shopping_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.online_shopping AS num
+        FROM tb_grid_pop_attr1 tgfa
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 500m 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_500m tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+UPDATE tb_selection_branch_collection_500m
+SET population_profile_online_shopping_home = avg_num
+FROM (
+    SELECT 
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN online_shopping_proportion = 0 THEN 0::NUMERIC 
+                ELSE (tgfa.online_shopping::NUMERIC / online_shopping_proportion) 
+            END AS total,
+            tgfa.grid_id, 
+            tgfa.online_shopping AS num 
+        FROM tb_grid_pop_attr1 tgfa
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 500m 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_500m tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+--专业技术人员预测
+UPDATE tb_selection_branch_collection_3km 
+SET population_profile_job_predict_engineer_work = avg_num
+FROM (
+    SELECT
+        -- ⚡ 核心修复：使用 NULLIF 防止分母为 0 崩溃，并转为 ::NUMERIC 保留小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN job_predict_engineer_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.job_predict_engineer::NUMERIC / job_predict_engineer_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.job_predict_engineer AS num
+        FROM tb_grid_pop_attr1 tgfa
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    JOIN tb_grid_bank_poi_3km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+UPDATE tb_selection_branch_collection_3km
+SET population_profile_job_predict_engineer_home = avg_num
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN job_predict_engineer_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.job_predict_engineer::NUMERIC / job_predict_engineer_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.job_predict_engineer AS num
+        FROM tb_grid_pop_attr1 tgfa
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    JOIN tb_grid_bank_poi_3km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+UPDATE tb_selection_branch_collection_1km
+SET population_profile_job_predict_engineer_work = avg_num
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN job_predict_engineer_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.job_predict_engineer::NUMERIC / job_predict_engineer_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.job_predict_engineer AS num
+        FROM tb_grid_pop_attr1 tgfa
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 1km 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_1km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+
+UPDATE tb_selection_branch_collection_1km
+SET population_profile_job_predict_engineer_home = avg_num
+FROM (
+    SELECT
+        -- ⚡ 核心修复：使用 NULLIF 防止分母为 0 崩溃，并转为 ::NUMERIC 保留小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN job_predict_engineer_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.job_predict_engineer::NUMERIC / job_predict_engineer_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.job_predict_engineer AS num
+        FROM tb_grid_pop_attr1 tgfa
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 1km 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_1km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+UPDATE tb_selection_branch_collection_500m
+SET population_profile_job_predict_engineer_work = avg_num
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN job_predict_engineer_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.job_predict_engineer::NUMERIC / job_predict_engineer_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.job_predict_engineer AS num
+        FROM tb_grid_pop_attr1 tgfa
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 500m 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_500m tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+UPDATE tb_selection_branch_collection_500m
+SET population_profile_job_predict_engineer_home = avg_num
+FROM (
+    SELECT 
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN job_predict_engineer_proportion = 0 THEN 0::NUMERIC 
+                ELSE (tgfa.job_predict_engineer::NUMERIC / job_predict_engineer_proportion) 
+            END AS total,
+            tgfa.grid_id, 
+            tgfa.job_predict_engineer AS num 
+        FROM tb_grid_pop_attr1 tgfa
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 500m 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_500m tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+
+--教师占比
+UPDATE tb_selection_branch_collection_3km 
+SET population_profile_teacher_work = avg_num
+FROM (
+    SELECT
+        -- ⚡ 核心修复：使用 NULLIF 防止分母为 0 崩溃，并转为 ::NUMERIC 保留小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN teacher_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.teacher::NUMERIC / teacher_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.teacher AS num
+        FROM tb_grid_personalized_portrait tgfa
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    JOIN tb_grid_bank_poi_3km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+UPDATE tb_selection_branch_collection_3km
+SET population_profile_teacher_home = avg_num
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN teacher_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.teacher::NUMERIC / teacher_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.teacher AS num
+        FROM tb_grid_personalized_portrait tgfa
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    JOIN tb_grid_bank_poi_3km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+UPDATE tb_selection_branch_collection_1km
+SET population_profile_teacher_work = avg_num
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN teacher_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.teacher::NUMERIC / teacher_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.teacher AS num
+        FROM tb_grid_personalized_portrait tgfa
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 1km 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_1km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+UPDATE tb_selection_branch_collection_1km
+SET population_profile_teacher_home = avg_num
+FROM (
+    SELECT
+        -- ⚡ 核心修复：使用 NULLIF 防止分母为 0 崩溃，并转为 ::NUMERIC 保留小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN teacher_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.teacher::NUMERIC / teacher_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.teacher AS num
+        FROM tb_grid_personalized_portrait tgfa
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 1km 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_1km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+UPDATE tb_selection_branch_collection_500m
+SET population_profile_teacher_work = avg_num
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN teacher_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.teacher::NUMERIC / teacher_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.teacher AS num
+        FROM tb_grid_personalized_portrait tgfa
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 500m 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_500m tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+UPDATE tb_selection_branch_collection_500m
+SET population_profile_teacher_home = avg_num
+FROM (
+    SELECT 
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN teacher_proportion = 0 THEN 0::NUMERIC 
+                ELSE (tgfa.teacher::NUMERIC / teacher_proportion) 
+            END AS total,
+            tgfa.grid_id, 
+            tgfa.teacher AS num 
+        FROM tb_grid_personalized_portrait tgfa
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 500m 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_500m tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+--超市便利店占比
+UPDATE tb_selection_branch_collection_3km 
+SET population_profile_supermarket_convenience_store_work = avg_num
+FROM (
+    SELECT
+        -- ⚡ 核心修复：使用 NULLIF 防止分母为 0 崩溃，并转为 ::NUMERIC 保留小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN supermarket_convenience_store_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.supermarket_convenience_store::NUMERIC / supermarket_convenience_store_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.supermarket_convenience_store AS num
+        FROM tb_grid_consumption_perference tgfa
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    JOIN tb_grid_bank_poi_3km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+UPDATE tb_selection_branch_collection_3km
+SET population_profile_supermarket_convenience_store_home = avg_num
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN supermarket_convenience_store_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.supermarket_convenience_store::NUMERIC / supermarket_convenience_store_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.supermarket_convenience_store AS num
+        FROM tb_grid_consumption_perference tgfa
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    JOIN tb_grid_bank_poi_3km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+UPDATE tb_selection_branch_collection_1km
+SET population_profile_supermarket_convenience_store_work = avg_num
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN supermarket_convenience_store_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.supermarket_convenience_store::NUMERIC / supermarket_convenience_store_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.supermarket_convenience_store AS num
+        FROM tb_grid_consumption_perference tgfa
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 1km 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_1km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+
+UPDATE tb_selection_branch_collection_1km
+SET population_profile_supermarket_convenience_store_home = avg_num
+FROM (
+    SELECT
+        -- ⚡ 核心修复：使用 NULLIF 防止分母为 0 崩溃，并转为 ::NUMERIC 保留小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN supermarket_convenience_store_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.supermarket_convenience_store::NUMERIC / supermarket_convenience_store_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.supermarket_convenience_store AS num
+        FROM tb_grid_consumption_perference tgfa
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 1km 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_1km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+
+UPDATE tb_selection_branch_collection_500m
+SET population_profile_supermarket_convenience_store_work = avg_num
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN supermarket_convenience_store_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.supermarket_convenience_store::NUMERIC / supermarket_convenience_store_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.supermarket_convenience_store AS num
+        FROM tb_grid_consumption_perference tgfa
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 500m 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_500m tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+UPDATE tb_selection_branch_collection_500m
+SET population_profile_supermarket_convenience_store_home = avg_num
+FROM (
+    SELECT 
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN supermarket_convenience_store_proportion = 0 THEN 0::NUMERIC 
+                ELSE (tgfa.supermarket_convenience_store::NUMERIC / supermarket_convenience_store_proportion) 
+            END AS total,
+            tgfa.grid_id, 
+            tgfa.supermarket_convenience_store AS num 
+        FROM tb_grid_consumption_perference tgfa
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 500m 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_500m tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+
+
+--小镇中老年占比
+UPDATE tb_selection_branch_collection_3km 
+SET population_profile_quinquagenarian_work = avg_num
+FROM (
+    SELECT
+        -- ⚡ 核心修复：使用 NULLIF 防止分母为 0 崩溃，并转为 ::NUMERIC 保留小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN quinquagenarian_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.quinquagenarian::NUMERIC / quinquagenarian_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.quinquagenarian AS num
+        FROM tb_grid_personalized_portrait tgfa
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    JOIN tb_grid_bank_poi_3km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+UPDATE tb_selection_branch_collection_3km
+SET population_profile_quinquagenarian_home = avg_num
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN quinquagenarian_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.quinquagenarian::NUMERIC / quinquagenarian_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.quinquagenarian AS num
+        FROM tb_grid_personalized_portrait tgfa
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    JOIN tb_grid_bank_poi_3km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+UPDATE tb_selection_branch_collection_1km
+SET population_profile_quinquagenarian_work = avg_num
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN quinquagenarian_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.quinquagenarian::NUMERIC / quinquagenarian_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.quinquagenarian AS num
+        FROM tb_grid_personalized_portrait tgfa
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 1km 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_1km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+
+UPDATE tb_selection_branch_collection_1km
+SET population_profile_quinquagenarian_home = avg_num
+FROM (
+    SELECT
+        -- ⚡ 核心修复：使用 NULLIF 防止分母为 0 崩溃，并转为 ::NUMERIC 保留小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN quinquagenarian_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.quinquagenarian::NUMERIC / quinquagenarian_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.quinquagenarian AS num
+        FROM tb_grid_personalized_portrait tgfa
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 1km 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_1km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+UPDATE tb_selection_branch_collection_500m
+SET population_profile_quinquagenarian_work = avg_num
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN quinquagenarian_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.quinquagenarian::NUMERIC / quinquagenarian_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.quinquagenarian AS num
+        FROM tb_grid_personalized_portrait tgfa
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 500m 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_500m tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+UPDATE tb_selection_branch_collection_500m
+SET population_profile_quinquagenarian_home = avg_num
+FROM (
+    SELECT 
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN quinquagenarian_proportion = 0 THEN 0::NUMERIC 
+                ELSE (tgfa.quinquagenarian::NUMERIC / quinquagenarian_proportion) 
+            END AS total,
+            tgfa.grid_id, 
+            tgfa.quinquagenarian AS num 
+        FROM tb_grid_personalized_portrait tgfa
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 500m 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_500m tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+
+
+--商旅人士占比
+UPDATE tb_selection_branch_collection_3km 
+SET population_profile_business_traveler_work = avg_num
+FROM (
+    SELECT
+        -- ⚡ 核心修复：使用 NULLIF 防止分母为 0 崩溃，并转为 ::NUMERIC 保留小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN business_traveler_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.business_traveler::NUMERIC / business_traveler_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.business_traveler AS num
+        FROM tb_grid_personalized_portrait tgfa
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    JOIN tb_grid_bank_poi_3km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+UPDATE tb_selection_branch_collection_3km
+SET population_profile_business_traveler_home = avg_num
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN business_traveler_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.business_traveler::NUMERIC / business_traveler_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.business_traveler AS num
+        FROM tb_grid_personalized_portrait tgfa
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    JOIN tb_grid_bank_poi_3km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+UPDATE tb_selection_branch_collection_1km
+SET population_profile_business_traveler_work = avg_num
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN business_traveler_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.business_traveler::NUMERIC / business_traveler_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.business_traveler AS num
+        FROM tb_grid_personalized_portrait tgfa
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 1km 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_1km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+UPDATE tb_selection_branch_collection_1km
+SET population_profile_business_traveler_home = avg_num
+FROM (
+    SELECT
+        -- ⚡ 核心修复：使用 NULLIF 防止分母为 0 崩溃，并转为 ::NUMERIC 保留小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN business_traveler_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.business_traveler::NUMERIC / business_traveler_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.business_traveler AS num
+        FROM tb_grid_personalized_portrait tgfa
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 1km 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_1km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+
+UPDATE tb_selection_branch_collection_500m
+SET population_profile_business_traveler_work = avg_num
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN business_traveler_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.business_traveler::NUMERIC / business_traveler_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.business_traveler AS num
+        FROM tb_grid_personalized_portrait tgfa
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 500m 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_500m tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+UPDATE tb_selection_branch_collection_500m
+SET population_profile_business_traveler_home = avg_num
+FROM (
+    SELECT 
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN business_traveler_proportion = 0 THEN 0::NUMERIC 
+                ELSE (tgfa.business_traveler::NUMERIC / business_traveler_proportion) 
+            END AS total,
+            tgfa.grid_id, 
+            tgfa.business_traveler AS num 
+        FROM tb_grid_personalized_portrait tgfa
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 500m 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_500m tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+
+
+--公务员&事业单位占比
+UPDATE tb_selection_branch_collection_3km 
+SET population_profile_servant_public_institution_work = avg_num * 10000
+FROM (
+    SELECT
+        -- ⚡ 核心修复：使用 NULLIF 防止分母为 0 崩溃，并转为 ::NUMERIC 保留小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN servant_public_institution_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.servant_public_institution::NUMERIC / servant_public_institution_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.servant_public_institution AS num
+        FROM tb_grid_personalized_portrait tgfa
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    JOIN tb_grid_bank_poi_3km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+
+UPDATE tb_selection_branch_collection_3km
+SET population_profile_servant_public_institution_home = avg_num * 10000
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN servant_public_institution_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.servant_public_institution::NUMERIC / servant_public_institution_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.servant_public_institution AS num
+        FROM tb_grid_personalized_portrait tgfa
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    JOIN tb_grid_bank_poi_3km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_3km.org_id;
+
+UPDATE tb_selection_branch_collection_1km
+SET population_profile_servant_public_institution_work = avg_num * 10000
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN servant_public_institution_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.servant_public_institution::NUMERIC / servant_public_institution_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.servant_public_institution AS num
+        FROM tb_grid_personalized_portrait tgfa
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 1km 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_1km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+
+UPDATE tb_selection_branch_collection_1km
+SET population_profile_servant_public_institution_home = avg_num * 10000
+FROM (
+    SELECT
+        -- ⚡ 核心修复：使用 NULLIF 防止分母为 0 崩溃，并转为 ::NUMERIC 保留小数精度
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN servant_public_institution_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.servant_public_institution::NUMERIC / servant_public_institution_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.servant_public_institution AS num
+        FROM tb_grid_personalized_portrait tgfa
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 1km 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_1km tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_1km.org_id;
+
+UPDATE tb_selection_branch_collection_500m
+SET population_profile_servant_public_institution_work = avg_num * 10000
+FROM (
+    SELECT
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id
+    FROM (
+        SELECT
+            CASE
+                WHEN servant_public_institution_proportion = 0 THEN 0::NUMERIC
+                ELSE (tgfa.servant_public_institution::NUMERIC / servant_public_institution_proportion)
+            END AS total,
+            tgfa.grid_id,
+            tgfa.servant_public_institution AS num
+        FROM tb_grid_personalized_portrait tgfa
+        WHERE tgfa.population_type = 'WORK'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 500m 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_500m tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+UPDATE tb_selection_branch_collection_500m
+SET population_profile_servant_public_institution_home = avg_num * 10000
+FROM (
+    SELECT 
+        SUM(num)::NUMERIC / NULLIF(SUM(total), 0) AS avg_num,
+        org_id 
+    FROM (
+        SELECT 
+            CASE 
+                WHEN servant_public_institution_proportion = 0 THEN 0::NUMERIC 
+                ELSE (tgfa.servant_public_institution::NUMERIC / servant_public_institution_proportion) 
+            END AS total,
+            tgfa.grid_id, 
+            tgfa.servant_public_institution AS num 
+        FROM tb_grid_personalized_portrait tgfa
+        WHERE tgfa.population_type = 'HOME'
+    ) t
+    -- ⚡ 核心修复：这里必须关联 500m 的网格银行关系表，原写成了 3km 表
+    JOIN tb_grid_bank_poi_500m tgbp2 ON t.grid_id = tgbp2.grid_id
+    GROUP BY org_id
+) t 
+WHERE t.org_id = tb_selection_branch_collection_500m.org_id;
+
+
+
+--银行网点
+update tb_selection_branch_collection_3km  set bank_geo_poi_num =  ta.num from (select t.org_id,sum(num) num from tb_grid_bank_poi_3km t 
+left join tb_grid_geo_loc loc on t.grid_id = loc.grid_id where loc.level2_classification = '银行'  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_3km.org_id ;
+
+update tb_selection_branch_collection_1km  set bank_geo_poi_num =  ta.num from (select t.org_id,sum(num) num from tb_grid_bank_poi_1km t 
+left join tb_grid_geo_loc loc on t.grid_id = loc.grid_id where loc.level2_classification = '银行'  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_1km.org_id ;
+
+update tb_selection_branch_collection_500m  set bank_geo_poi_num =  ta.num from (select t.org_id,sum(num) num from tb_grid_bank_poi_500m t 
+left join tb_grid_geo_loc loc on t.grid_id = loc.grid_id where loc.level2_classification = '银行'  group by t.org_id) 
+ta where ta.org_id = tb_selection_branch_collection_500m.org_id ;
+
+
+---综合人口密度
+update tb_selection_branch_collection_3km set all_pedestrian_density = pedestrian_density + resident_density +working_density;
+
+update tb_selection_branch_collection_1km set all_pedestrian_density = pedestrian_density + resident_density +working_density;
+
+update tb_selection_branch_collection_500m set all_pedestrian_density = pedestrian_density + resident_density +working_density;
+
+-- 高端客群指数
+
+UPDATE tb_selection_branch_collection_3km
+SET population_profile_wealthy_person = population_profile_hieg_end_individual_home * population_profile_white_collar_work * 10000;
+
+
+
+UPDATE tb_selection_branch_collection_1km
+SET population_profile_wealthy_person = population_profile_hieg_end_individual_home * population_profile_white_collar_work * 10000;
+
+
+
+
+UPDATE tb_selection_branch_collection_500m
+SET population_profile_wealthy_person = population_profile_hieg_end_individual_home * population_profile_white_collar_work * 10000;
+
+
+
+--职住平衡
+update tb_selection_branch_collection_3km set job_housing_balance = abs (resident_density - working_density) ;
+
+update tb_selection_branch_collection_1km set job_housing_balance = abs (resident_density - working_density);
+
+
+update tb_selection_branch_collection_500m set job_housing_balance =abs (resident_density - working_density);
+
+
+
+--客流密度比x居住人群高净值人群占比
+update tb_selection_branch_collection_3km set
+pedestrian_density_x_resident_density = (pedestrian_density*population_profile_hieg_end_individual_home * 10000) ;
+update tb_selection_branch_collection_1km set
+pedestrian_density_x_resident_density = (pedestrian_density*population_profile_hieg_end_individual_home * 10000) ;
+update tb_selection_branch_collection_500m set
+pedestrian_density_x_resident_density = (pedestrian_density*population_profile_hieg_end_individual_home * 10000) ; ;
+
+
+--工作人群白领占比x银行_国有行竞品网点数
+update tb_selection_branch_collection_3km set population_profile_white_collar_work_x_state_owned_bank_num = (population_profile_white_collar_work*state_owned_bank_num) ;
+update tb_selection_branch_collection_1km set population_profile_white_collar_work_x_state_owned_bank_num =(population_profile_white_collar_work*state_owned_bank_num) ;
+update tb_selection_branch_collection_500m set population_profile_white_collar_work_x_state_owned_bank_num = (population_profile_white_collar_work*state_owned_bank_num) ;
+
+
+
+--居住人口密度比x交通配套公交站数
+update tb_selection_branch_collection_3km set resident_density_x_bus_station_num = (resident_density*bus_station_num) ;
+update tb_selection_branch_collection_1km set resident_density_x_bus_station_num =(resident_density*bus_station_num) ;
+update tb_selection_branch_collection_500m set resident_density_x_bus_station_num = (resident_density*bus_station_num) ;
+
+
+--聚合[客流密度比，居住人口密度比，工作人口密度比
+update tb_selection_branch_collection_3km set mean_pedestrian_density_resident_density_working_density = (pedestrian_density+resident_density+working_density)/3 ;
+update tb_selection_branch_collection_1km set mean_pedestrian_density_resident_density_working_density = (pedestrian_density+resident_density+working_density)/3 ;
+update tb_selection_branch_collection_500m set mean_pedestrian_density_resident_density_working_density = (pedestrian_density+resident_density+working_density)/3 ;
+
+--男性占比
+
+UPDATE tb_selection_branch_collection_3km s
+SET man_work = t.avg_num
+FROM (
+    SELECT
+        SUM(p.gender_male) / NULLIF(SUM(p.gender_female + p.gender_male), 0) AS avg_num,
+        g.org_id
+    FROM tb_grid_pop_attr1 p
+    JOIN tb_grid_bank_poi_3km g ON g.grid_id = p.grid_id
+    WHERE p.population_type = 'WORK'
+    GROUP BY g.org_id
+) t
+WHERE t.org_id = s.org_id;
+
+
+UPDATE tb_selection_branch_collection_3km s
+SET man_home = t.avg_num
+FROM (
+    SELECT
+        SUM(p.gender_male) / NULLIF(SUM(p.gender_female + p.gender_male), 0) AS avg_num,
+        g.org_id
+    FROM tb_grid_pop_attr1 p
+    JOIN tb_grid_bank_poi_3km g ON g.grid_id = p.grid_id
+    WHERE p.population_type = 'HOME'
+    GROUP BY g.org_id
+) t
+WHERE t.org_id = s.org_id;
+
+
+
+
+UPDATE tb_selection_branch_collection_1km s
+SET man_work = t.avg_num
+FROM (
+    SELECT
+        SUM(p.gender_male) / NULLIF(SUM(p.gender_female + p.gender_male), 0) AS avg_num,
+        g.org_id
+    FROM tb_grid_pop_attr1 p
+    JOIN tb_grid_bank_poi_1km g ON g.grid_id = p.grid_id
+    WHERE p.population_type = 'WORK'
+    GROUP BY g.org_id
+) t
+WHERE t.org_id = s.org_id;
+
+
+UPDATE tb_selection_branch_collection_1km s
+SET man_home = t.avg_num
+FROM (
+    SELECT
+        SUM(p.gender_male) / NULLIF(SUM(p.gender_female + p.gender_male), 0) AS avg_num,
+        g.org_id
+    FROM tb_grid_pop_attr1 p
+    JOIN tb_grid_bank_poi_1km g ON g.grid_id = p.grid_id
+    WHERE p.population_type = 'HOME'
+    GROUP BY g.org_id
+) t
+WHERE t.org_id = s.org_id;
+
+
+
+UPDATE tb_selection_branch_collection_500m s
+SET man_work = t.avg_num
+FROM (
+    SELECT
+        SUM(p.gender_male) / NULLIF(SUM(p.gender_female + p.gender_male), 0) AS avg_num,
+        g.org_id
+    FROM tb_grid_pop_attr1 p
+    JOIN tb_grid_bank_poi_500m g ON g.grid_id = p.grid_id
+    WHERE p.population_type = 'WORK'
+    GROUP BY g.org_id
+) t
+WHERE t.org_id = s.org_id;
+
+
+UPDATE tb_selection_branch_collection_500m s
+SET man_home = t.avg_num
+FROM (
+    SELECT
+        SUM(p.gender_male) / NULLIF(SUM(p.gender_female + p.gender_male), 0) AS avg_num,
+        g.org_id
+    FROM tb_grid_pop_attr1 p
+    JOIN tb_grid_bank_poi_500m g ON g.grid_id = p.grid_id
+    WHERE p.population_type = 'HOME'
+    GROUP BY g.org_id
+) t
+WHERE t.org_id = s.org_id;

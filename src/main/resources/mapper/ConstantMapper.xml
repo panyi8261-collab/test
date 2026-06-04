@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.ConstantMapper">
+
+    <!-- 计算某城市某月份 HOME 平均每格居住人口 -->
+    <select id="calcAvgHomePerGrid" resultType="java.lang.Double">
+        SELECT COALESCE(SUM(num) / 6340.0, 0)
+        FROM tb_grid_permanent_num
+        WHERE population_type = 'HOME'
+          AND city_code = #{cityCode}
+          AND date = #{date}
+    </select>
+
+    <!-- 计算某城市某月份 WORK 平均每格工作人口 -->
+    <select id="calcAvgWorkPerGrid" resultType="java.lang.Double">
+        SELECT COALESCE(SUM(num) / 6340.0, 0)
+        FROM tb_grid_permanent_num
+        WHERE population_type = 'WORK'
+          AND city_code = #{cityCode}
+          AND date = #{date}
+    </select>
+
+</mapper>

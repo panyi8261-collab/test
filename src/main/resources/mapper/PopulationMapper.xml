@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.PopulationMapper">
+
+    <!-- ================================================================== -->
+    <!-- 第一类：直接来自 tb_grid_pop_attr1（单表，无JOIN）              -->
+    <!-- ================================================================== -->
+
+    <!-- 年龄35-54占比：(age_3544 + age_4554) / (gender_female + gender_male) -->
+    <select id="calcAgeRatio" resultType="java.util.LinkedHashMap">
+        SELECT
+            p.grid_id AS code,
+            (p.age_3544 + p.age_4554)::numeric / NULLIF((p.gender_female + p.gender_male), 0) AS result
+        FROM tb_grid_pop_attr1 p
+        WHERE p.grid_id IN
+        <foreach collection="gridList" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+          AND p.date = #{date}
+          AND p.population_type = #{populationType}
+    </select>
+
+    <!-- 男性占比：gender_male / (gender_female + gender_male) -->
+    <select id="calcMaleRatio" resultType="java.util.LinkedHashMap">
+        SELECT
+            p.grid_id AS code,
+            p.gender_male::numeric / NULLIF((p.gender_female + p.gender_male), 0) AS result
+        FROM tb_grid_pop_attr1 p
+        WHERE p.grid_id IN
+        <foreach collection="gridList" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+          AND p.date = #{date}
+          AND p.population_type = #{populationType}
+    </select>
+
+    <!-- 有车占比：has_car / (gender_female + gender_male) -->
+    <select id="calcCarRatio" resultType="java.util.LinkedHashMap">
+        SELECT
+            p.grid_id AS code,
+            p.has_car::numeric / NULLIF((p.gender_female + p.gender_male), 0) AS result
+        FROM tb_grid_pop_attr1 p
+        WHERE p.grid_id IN
+        <foreach collection="gridList" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+          AND p.date = #{date}
+          AND p.population_type = #{populationType}
+    </select>
+
+    <!-- 本科及以上占比：qualification_undergraduate_graduate / (gender_female + gender_male) -->
+    <select id="calcBachelorRatio" resultType="java.util.LinkedHashMap">
+        SELECT
+            p.grid_id AS code,
+            p.qualification_undergraduate_graduate::numeric / NULLIF((p.gender_female + p.gender_male), 0) AS result
+        FROM tb_grid_pop_attr1 p
+        WHERE p.grid_id IN
+        <foreach collection="gridList" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+          AND p.date = #{date}
+          AND p.population_type = #{populationType}
+    </select>
+
+    <!-- ================================================================== -->
+    <!-- 第二类：JOIN tb_grid_personalized_portrait（比例还原）           -->
+    <!-- ================================================================== -->
+
+    <!-- 有房占比：SUM(there_room) / SUM(gender_female+gender_male) -->
+    <select id="calcHomeOwnerRatio" resultType="java.util.LinkedHashMap">
+        SELECT
+            t.grid_id AS code,
+            SUM(t.num)::numeric / NULLIF(SUM(t.total), 0) AS result
+        FROM (
+            SELECT
+                p.grid_id,
+                (p.gender_female + p.gender_male) AS total,
+                tp.there_room AS num
+            FROM tb_grid_pop_attr1 p
+            JOIN tb_grid_personalized_portrait tp
+                ON p.grid_id = tp.grid_id AND p.population_type = tp.population_type
+            WHERE p.grid_id IN
+            <foreach collection="gridList" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+              AND p.date = #{date}
+              AND p.population_type = #{populationType}
+        ) t
+        GROUP BY t.grid_id
+    </select>
+
+    <!-- 白领占比：white_collar_general_staff / 还原总人口 -->
+    <select id="calcWhiteCollarRatio" resultType="java.util.LinkedHashMap">
+        SELECT
+            t.grid_id AS code,
+            SUM(t.num)::numeric / NULLIF(SUM(t.total), 0) AS result
+        FROM (
+            SELECT
+                p.grid_id,
+                CASE
+                    WHEN tp.white_collar_general_staff_proportion = 0 THEN 0
+                    ELSE (tp.white_collar_general_staff / tp.white_collar_general_staff_proportion)
+                END AS total,
+                tp.white_collar_general_staff AS num
+            FROM tb_grid_pop_attr1 p
+            JOIN tb_grid_personalized_portrait tp
+                ON p.grid_id = tp.grid_id AND p.population_type = tp.population_type
+            WHERE p.grid_id IN
+            <foreach collection="gridList" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+              AND p.date = #{date}
+              AND p.population_type = #{populationType}
+        ) t
+        GROUP BY t.grid_id
+    </select>
+
+    <!-- 中产占比：senior_middle_class / 还原总人口 -->
+    <select id="calcSeniorMiddleClassRatio" resultType="java.util.LinkedHashMap">
+        SELECT
+            t.grid_id AS code,
+            SUM(t.num)::numeric / NULLIF(SUM(t.total), 0) AS result
+        FROM (
+            SELECT
+                p.grid_id,
+                CASE
+                    WHEN tp.senior_middle_class_proportion = 0 THEN 0
+                    ELSE (tp.senior_middle_class / tp.senior_middle_class_proportion)
+                END AS total,
+                tp.senior_middle_class AS num
+            FROM tb_grid_pop_attr1 p
+            JOIN tb_grid_personalized_portrait tp
+                ON p.grid_id = tp.grid_id AND p.population_type = tp.population_type
+            WHERE p.grid_id IN
+            <foreach collection="gridList" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+              AND p.date = #{date}
+              AND p.population_type = #{populationType}
+        ) t
+        GROUP BY t.grid_id
+    </select>
+
+    <!-- 银发占比：urban_silver_haired / 还原总人口 -->
+    <select id="calcSilverHairedRatio" resultType="java.util.LinkedHashMap">
+        SELECT
+            t.grid_id AS code,
+            SUM(t.num)::numeric / NULLIF(SUM(t.total), 0) AS result
+        FROM (
+            SELECT
+                p.grid_id,
+                CASE
+                    WHEN tp.urban_silver_haired_proportion = 0 THEN 0
+                    ELSE (tp.urban_silver_haired / tp.urban_silver_haired_proportion)
+                END AS total,
+                tp.urban_silver_haired AS num
+            FROM tb_grid_pop_attr1 p
+            JOIN tb_grid_personalized_portrait tp
+                ON p.grid_id = tp.grid_id AND p.population_type = tp.population_type
+            WHERE p.grid_id IN
+            <foreach collection="gridList" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+              AND p.date = #{date}
+              AND p.population_type = #{populationType}
+        ) t
+        GROUP BY t.grid_id
+    </select>
+
+    <!-- 金融理财人群占比：financial_management / 还原总人口 -->
+    <select id="calcFinancialManagementRatio" resultType="java.util.LinkedHashMap">
+        SELECT
+            t.grid_id AS code,
+            SUM(t.num)::numeric / NULLIF(SUM(t.total), 0) AS result
+        FROM (
+            SELECT
+                p.grid_id,
+                CASE
+                    WHEN tp.financial_management_proportion = 0 THEN 0
+                    ELSE (tp.financial_management / tp.financial_management_proportion)
+                END AS total,
+                tp.financial_management AS num
+            FROM tb_grid_pop_attr1 p
+            JOIN tb_grid_personalized_portrait tp
+                ON p.grid_id = tp.grid_id AND p.population_type = tp.population_type
+            WHERE p.grid_id IN
+            <foreach collection="gridList" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+              AND p.date = #{date}
+              AND p.population_type = #{populationType}
+        ) t
+        GROUP BY t.grid_id
+    </select>
+
+    <!-- 高消费占比：consume_high / 还原总人口 -->
+    <select id="calcConsumeHighRatio" resultType="java.util.LinkedHashMap">
+        SELECT
+            t.grid_id AS code,
+            SUM(t.num)::numeric / NULLIF(SUM(t.total), 0) AS result
+        FROM (
+            SELECT
+                p.grid_id,
+                CASE
+                    WHEN tp.consume_high_proportion = 0 THEN 0
+                    ELSE (tp.consume_high / tp.consume_high_proportion)
+                END AS total,
+                tp.consume_high AS num
+            FROM tb_grid_pop_attr1 p
+            JOIN tb_grid_personalized_portrait tp
+                ON p.grid_id = tp.grid_id AND p.population_type = tp.population_type
+            WHERE p.grid_id IN
+            <foreach collection="gridList" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+              AND p.date = #{date}
+              AND p.population_type = #{populationType}
+        ) t
+        GROUP BY t.grid_id
+    </select>
+
+    <!-- 高净值人群占比：hieg_end_individual / 还原总人口 -->
+    <select id="calcHighEndIndividualRatio" resultType="java.util.LinkedHashMap">
+        SELECT
+            t.grid_id AS code,
+            SUM(t.num)::numeric / NULLIF(SUM(t.total), 0) AS result
+        FROM (
+            SELECT
+                p.grid_id,
+                CASE
+                    WHEN tp.hieg_end_individual_proportion = 0 THEN 0
+                    ELSE (tp.hieg_end_individual / tp.hieg_end_individual_proportion)
+                END AS total,
+                tp.hieg_end_individual AS num
+            FROM tb_grid_pop_attr1 p
+            JOIN tb_grid_personalized_portrait tp
+                ON p.grid_id = tp.grid_id AND p.population_type = tp.population_type
+            WHERE p.grid_id IN
+            <foreach collection="gridList" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+              AND p.date = #{date}
+              AND p.population_type = #{populationType}
+        ) t
+        GROUP BY t.grid_id
+    </select>
+
+    <!-- ================================================================== -->
+    <!-- 第三类：密度计算（面积 120×120=14400 + 归一化常量）              -->
+    <!-- ================================================================== -->
+
+    <!-- 客流密度：hf.num / 14400 / #{totalArea}（totalArea 写死 1767984.22） -->
+    <select id="calcPedestrianDensity" resultType="java.util.LinkedHashMap">
+        SELECT
+            p.grid_id AS code,
+            (hf.num / 14400.0) / #{totalArea} AS result
+        FROM tb_grid_pop_attr1 p
+        JOIN tb_grid_hour_flow hf
+            ON p.grid_id = hf.grid_id
+        WHERE p.grid_id IN
+        <foreach collection="gridList" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+          AND p.date = #{date}
+    </select>
+
+    <!-- 居住人口密度：pn.num / 14400.0 / #{avgPerGrid} -->
+    <select id="calcResidentDensity" resultType="java.util.LinkedHashMap">
+        SELECT
+            p.grid_id AS code,
+            (pn.num / 14400.0) / #{avgPerGrid} AS result
+        FROM tb_grid_pop_attr1 p
+        JOIN tb_grid_permanent_num pn
+            ON p.grid_id = pn.grid_id AND pn.population_type = 'HOME'
+        WHERE p.grid_id IN
+        <foreach collection="gridList" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+          AND p.date = #{date}
+    </select>
+
+    <!-- 工作人口密度：pn.num / 14400.0 / #{avgPerGrid} -->
+    <select id="calcWorkingDensity" resultType="java.util.LinkedHashMap">
+        SELECT
+            p.grid_id AS code,
+            (pn.num / 14400.0) / #{avgPerGrid} AS result
+        FROM tb_grid_pop_attr1 p
+        JOIN tb_grid_permanent_num pn
+            ON p.grid_id = pn.grid_id AND pn.population_type = 'WORK'
+        WHERE p.grid_id IN
+        <foreach collection="gridList" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+          AND p.date = #{date}
+    </select>
+
+    <!-- 工作日/节假日客流比：WROK_HOUR_FLOW / HOLIDAY_HOUR_FLOW -->
+    <select id="calcWorkHolidayFlowRatio" resultType="java.util.LinkedHashMap">
+        SELECT
+            p.grid_id AS code,
+            (work_flow.num / NULLIF(holiday_flow.num, 0)) AS result
+        FROM tb_grid_pop_attr1 p
+        JOIN tb_grid_hour_flow work_flow
+            ON p.grid_id = work_flow.grid_id AND work_flow.type = 'WROK_HOUR_FLOW'
+        JOIN tb_grid_hour_flow holiday_flow
+            ON p.grid_id = holiday_flow.grid_id AND holiday_flow.type = 'HOLIDAY_HOUR_FLOW'
+        WHERE p.grid_id IN
+        <foreach collection="gridList" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+          AND p.date = #{date}
+    </select>
+
+</mapper>
