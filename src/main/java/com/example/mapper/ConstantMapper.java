@@ -22,4 +22,16 @@ public interface ConstantMapper {
      */
     Double calcAvgWorkPerGrid(@Param("cityCode") String cityCode,
                               @Param("date") String date);
+
+    /**
+     * 从任意 grid_id + date 获取所属城市编码。
+     */
+    String getCityCodeByGridId(@Param("gridId") String gridId,
+                               @Param("date") String date);
+
+    /**
+     * 计算某城市总面积（网格数 × 14400）。
+     * 替代原写死的城市面积常量 1767984.22。
+     */
+    Double calcCityTotalArea(@Param("cityCode") String cityCode);
 }

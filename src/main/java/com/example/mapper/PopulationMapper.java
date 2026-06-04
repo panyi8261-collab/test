@@ -18,133 +18,189 @@ import java.util.Map;
 public interface PopulationMapper {
 
     // ========================================================================
-    // 第一类：直接来自 tb_grid_pop_attr1（单表，无JOIN）
+    // Group 0 — 基础人口指标
     // ========================================================================
 
-    /**
-     * 年龄 35-54 占比：(age_3544 + age_4554) / (gender_female + gender_male)
-     * 对应 population_profile_age_35_54_*
-     */
     List<Map<String, Object>> calcAgeRatio(@Param("gridList") List<String> gridList,
                                            @Param("date") String date,
                                            @Param("populationType") String populationType);
 
-    /**
-     * 男性占比：gender_male / (gender_female + gender_male)
-     * 对应 man_*
-     */
     List<Map<String, Object>> calcMaleRatio(@Param("gridList") List<String> gridList,
                                             @Param("date") String date,
                                             @Param("populationType") String populationType);
 
-    /**
-     * 有车占比：has_car / (gender_female + gender_male)
-     * 对应 population_profile_car_*
-     */
     List<Map<String, Object>> calcCarRatio(@Param("gridList") List<String> gridList,
                                            @Param("date") String date,
                                            @Param("populationType") String populationType);
 
-    /**
-     * 本科及以上占比：qualification_undergraduate_graduate / (gender_female + gender_male)
-     * 对应 population_profile_bachelor_*
-     */
     List<Map<String, Object>> calcBachelorRatio(@Param("gridList") List<String> gridList,
                                                 @Param("date") String date,
                                                 @Param("populationType") String populationType);
 
-    // ========================================================================
-    // 第二类：JOIN tb_grid_personalized_portrait（需要比例还原）
-    // ========================================================================
-
-    /**
-     * 有房占比：SUM(there_room) / SUM(gender_female+gender_male)
-     * 对应 population_profile_home_*
-     */
     List<Map<String, Object>> calcHomeOwnerRatio(@Param("gridList") List<String> gridList,
                                                  @Param("date") String date,
                                                  @Param("populationType") String populationType);
 
-    /**
-     * 白领占比：white_collar_general_staff / 还原后总人口
-     * 对应 population_profile_white_collar_*
-     */
     List<Map<String, Object>> calcWhiteCollarRatio(@Param("gridList") List<String> gridList,
                                                    @Param("date") String date,
                                                    @Param("populationType") String populationType);
 
-    /**
-     * 中产占比：senior_middle_class / 还原后总人口
-     * 对应 population_profile_senior_middle_class_*
-     */
     List<Map<String, Object>> calcSeniorMiddleClassRatio(@Param("gridList") List<String> gridList,
                                                          @Param("date") String date,
                                                          @Param("populationType") String populationType);
 
-    /**
-     * 银发占比：urban_silver_haired / 还原后总人口
-     * 对应 population_profile_urban_silver_haired_*
-     */
     List<Map<String, Object>> calcSilverHairedRatio(@Param("gridList") List<String> gridList,
                                                     @Param("date") String date,
                                                     @Param("populationType") String populationType);
 
-    /**
-     * 金融理财人群占比：financial_management / 还原后总人口
-     * 对应 population_profile_financial_management_*
-     */
     List<Map<String, Object>> calcFinancialManagementRatio(@Param("gridList") List<String> gridList,
                                                            @Param("date") String date,
                                                            @Param("populationType") String populationType);
 
-    /**
-     * 高消费占比：consume_high / 还原后总人口
-     * 对应 population_profile_consume_high_*
-     */
     List<Map<String, Object>> calcConsumeHighRatio(@Param("gridList") List<String> gridList,
                                                    @Param("date") String date,
                                                    @Param("populationType") String populationType);
 
-    /**
-     * 高净值人群占比：hieg_end_individual / 还原后总人口
-     * 对应 population_profile_hieg_end_individual_*
-     */
     List<Map<String, Object>> calcHighEndIndividualRatio(@Param("gridList") List<String> gridList,
                                                          @Param("date") String date,
                                                          @Param("populationType") String populationType);
 
-    // ========================================================================
-    // 第三类：密度计算（需要面积 / 归一化常量）
-    // ========================================================================
-
-    /**
-     * 客流密度：num / 14400 / cityTotalArea
-     * 对应 pedestrian_density（cityTotalArea = 1767984.22 写死传入）
-     */
     List<Map<String, Object>> calcPedestrianDensity(@Param("gridList") List<String> gridList,
                                                     @Param("date") String date,
                                                     @Param("totalArea") Double totalArea);
 
-    /**
-     * 居住人口密度：num / 14400 / avgHomePerGrid
-     * 对应 resident_density（avgHomePerGrid 由 ConstantMapper.calcAvgHomePerGrid 预计算）
-     */
     List<Map<String, Object>> calcResidentDensity(@Param("gridList") List<String> gridList,
                                                   @Param("date") String date,
                                                   @Param("avgPerGrid") Double avgPerGrid);
 
-    /**
-     * 工作人口密度：num / 14400 / avgWorkPerGrid
-     * 对应 working_density（avgWorkPerGrid 由 ConstantMapper.calcAvgWorkPerGrid 预计算）
-     */
     List<Map<String, Object>> calcWorkingDensity(@Param("gridList") List<String> gridList,
                                                  @Param("date") String date,
                                                  @Param("avgPerGrid") Double avgPerGrid);
 
-    /**
-     * 工作日/节假日客流比：WROK_HOUR_FLOW / HOLIDAY_HOUR_FLOW
-     * 对应 work_perdestrian_density
-     */
     List<Map<String, Object>> calcWorkHolidayFlowRatio(@Param("gridList") List<String> gridList,
                                                        @Param("date") String date);
+
+    // ========================================================================
+    // Group 1 — 人群画像（新增）
+    // ========================================================================
+
+    /** 高资产人群占比：asset_grade_high / (gender_female+gender_male) */
+    List<Map<String, Object>> calcHighAssetRatio(@Param("gridList") List<String> gridList,
+                                                 @Param("date") String date,
+                                                 @Param("populationType") String populationType);
+
+    /** 收入2w+人群占比：income_20000 / (gender_female+gender_male) */
+    List<Map<String, Object>> calcIncome2wRatio(@Param("gridList") List<String> gridList,
+                                                @Param("date") String date,
+                                                @Param("populationType") String populationType);
+
+    /** 收入2499及以下人群占比：income_9999 / (gender_female+gender_male) */
+    List<Map<String, Object>> calcIncomeLowRatio(@Param("gridList") List<String> gridList,
+                                                 @Param("date") String date,
+                                                 @Param("populationType") String populationType);
+
+    /** 网购能力预测占比：online_shopping */
+    List<Map<String, Object>> calcOnlineShoppingRatio(@Param("gridList") List<String> gridList,
+                                                      @Param("date") String date,
+                                                      @Param("populationType") String populationType);
+
+    /** 小镇中老年占比：quinquagenarian */
+    List<Map<String, Object>> calcQuinquagenarianRatio(@Param("gridList") List<String> gridList,
+                                                       @Param("date") String date,
+                                                       @Param("populationType") String populationType);
+
+    /** 教师占比：teacher */
+    List<Map<String, Object>> calcTeacherRatio(@Param("gridList") List<String> gridList,
+                                               @Param("date") String date,
+                                               @Param("populationType") String populationType);
+
+    /** 商旅人士占比：business_traveler */
+    List<Map<String, Object>> calcBusinessTravelerRatio(@Param("gridList") List<String> gridList,
+                                                        @Param("date") String date,
+                                                        @Param("populationType") String populationType);
+
+    /** 公务员&事业单位占比：servant_public_institution */
+    List<Map<String, Object>> calcServantRatio(@Param("gridList") List<String> gridList,
+                                               @Param("date") String date,
+                                               @Param("populationType") String populationType);
+
+    /** 管理者和企业主占比：job_manager_bussines_owner */
+    List<Map<String, Object>> calcManagerRatio(@Param("gridList") List<String> gridList,
+                                               @Param("date") String date,
+                                               @Param("populationType") String populationType);
+
+    /** 生产操作者占比：job_worker */
+    List<Map<String, Object>> calcWorkerRatio(@Param("gridList") List<String> gridList,
+                                              @Param("date") String date,
+                                              @Param("populationType") String populationType);
+
+    /** 专业技术人员占比：job_predict_engineer */
+    List<Map<String, Object>> calcEngineerRatio(@Param("gridList") List<String> gridList,
+                                                @Param("date") String date,
+                                                @Param("populationType") String populationType);
+
+    /** 餐饮生活消费占比：food */
+    List<Map<String, Object>> calcFoodRatio(@Param("gridList") List<String> gridList,
+                                            @Param("date") String date,
+                                            @Param("populationType") String populationType);
+
+    /** 超市便利店消费占比：supermarket_convenience_store */
+    List<Map<String, Object>> calcSupermarketRatio(@Param("gridList") List<String> gridList,
+                                                   @Param("date") String date,
+                                                   @Param("populationType") String populationType);
+
+    /** 高端消费占比：accessories + electronic_digital */
+    List<Map<String, Object>> calcHighEndConsumeRatio(@Param("gridList") List<String> gridList,
+                                                      @Param("date") String date,
+                                                      @Param("populationType") String populationType);
+
+    // ========================================================================
+    // Group 2 — 金融成熟度
+    // ========================================================================
+
+    /** 中行APP用户占比：debit_card_bc / 比例还原 */
+    List<Map<String, Object>> calcBocAppRatio(@Param("gridList") List<String> gridList,
+                                              @Param("date") String date,
+                                              @Param("populationType") String populationType);
+
+    /** 国有竞品APP用户占比：工农建交邮储之和 / 比例还原 */
+    List<Map<String, Object>> calcStateOwnedAppRatio(@Param("gridList") List<String> gridList,
+                                                     @Param("date") String date,
+                                                     @Param("populationType") String populationType);
+
+    /** 全国性股份制APP用户占比 */
+    List<Map<String, Object>> calcJointStockAppRatio(@Param("gridList") List<String> gridList,
+                                                     @Param("date") String date,
+                                                     @Param("populationType") String populationType);
+
+    /** 金融APP用户占比 */
+    List<Map<String, Object>> calcFinanceAppRatio(@Param("gridList") List<String> gridList,
+                                                  @Param("date") String date,
+                                                  @Param("populationType") String populationType);
+
+    // ========================================================================
+    // Group 3 — 区域配套（tb_grid_geo_loc）
+    // ========================================================================
+
+    List<Map<String, Object>> calcGeoLocCount(@Param("gridList") List<String> gridList,
+                                              @Param("date") String date,
+                                              @Param("level2List") List<String> level2List,
+                                              @Param("level1") String level1);
+
+    // ========================================================================
+    // Group 4 — 地块价值（tb_grid_land_value）
+    // ========================================================================
+
+    List<Map<String, Object>> calcAvgHousePrice(@Param("gridList") List<String> gridList,
+                                                @Param("date") String date);
+
+    List<Map<String, Object>> calcAvgRent(@Param("gridList") List<String> gridList,
+                                          @Param("date") String date);
+
+    // ========================================================================
+    // Group 6 — 不利因素
+    // ========================================================================
+
+    List<Map<String, Object>> calcCemeteryCount(@Param("gridList") List<String> gridList,
+                                                @Param("date") String date);
 }

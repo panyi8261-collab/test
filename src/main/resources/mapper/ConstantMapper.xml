@@ -22,4 +22,18 @@
           AND date = #{date}
     </select>
 
+    <!-- 从任意 grid_id 获取所属城市编码 -->
+    <select id="getCityCodeByGridId" resultType="java.lang.String">
+        SELECT city_code
+        FROM tb_grid
+        WHERE grid_id = #{gridId}
+    </select>
+
+    <!-- 计算某城市总面积（网格数 × 14400），替代原写死的城市面积常量 -->
+    <select id="calcCityTotalArea" resultType="java.lang.Double">
+        SELECT COALESCE(COUNT(1) * 14400.0, 0)
+        FROM tb_grid
+        WHERE city_code = #{cityCode}
+    </select>
+
 </mapper>
