@@ -1,0 +1,30 @@
+package com.example.controller;
+
+import com.example.dto.ApiResponse;
+import com.example.dto.ReportData;
+import com.example.dto.SiteReportRequest;
+import com.example.service.SiteReportService;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/site-report")
+public class SiteReportController {
+
+    private final SiteReportService siteReportService;
+
+    public SiteReportController(SiteReportService siteReportService) {
+        this.siteReportService = siteReportService;
+    }
+
+    @PostMapping("/data")
+    public ApiResponse<ReportData> data(@RequestBody(required = false) SiteReportRequest request) {
+        try {
+            return siteReportService.buildReport(request);
+        } catch (Exception e) {
+            return ApiResponse.error(5000, e.getMessage());
+        }
+    }
+}

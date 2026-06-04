@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.RegionalScoreMapper">
+
+    <resultMap id="regionalScoreMap" type="com.example.entity.RegionalScore">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="type" column="type"/>
+        <result property="provinceCode" column="province_code"/>
+        <result property="cityCode" column="city_code"/>
+        <result property="districtCode" column="district_code"/>
+        <result property="collectionDate" column="collection_date"/>
+        <result property="modelId" column="model_id"/>
+        <result property="status" column="status"/>
+        <result property="modelParamJson" column="model_param_json"/>
+        <result property="modelScoreMaxMin" column="model_score_max_min"/>
+        <result property="useType" column="use_type"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="coord" column="coord"/>
+    </resultMap>
+
+    <resultMap id="regionalScoreGridMap" type="com.example.entity.RegionalScoreGrid">
+        <id property="gridId" column="grid_id"/>
+        <result property="regionalScoreId" column="regional_score_id"/>
+        <result property="name" column="name"/>
+        <result property="gridIndicatorScore" column="grid_indicator_score"/>
+        <result property="gridPopScore" column="grid_pop_score"/>
+        <result property="gridPeerScore" column="grid_peer_score"/>
+        <result property="gridResourceScore" column="grid_resource_score"/>
+        <result property="gridTrafficScore" column="grid_traffic_score"/>
+        <result property="gridRoadScore" column="grid_road_score"/>
+    </resultMap>
+
+    <select id="selectRegionalScoreById" resultMap="regionalScoreMap">
+        SELECT
+            id,
+            name,
+            type,
+            province_code,
+            city_code,
+            district_code,
+            collection_date,
+            model_id,
+            status,
+            model_param_json,
+            model_score_max_min,
+            use_type,
+            create_time,
+            update_time,
+            CASE
+                WHEN geom IS NULL THEN NULL
+                ELSE CONCAT(
+                    ROUND(ST_X(ST_PointOnSurface(geom))::numeric, 6),
+                    ' , ',
+                    ROUND(ST_Y(ST_PointOnSurface(geom))::numeric, 6)
+                )
+            END AS coord
+        FROM tb_regional_score
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectGridScores" resultMap="regionalScoreGridMap">
+        SELECT
+            grid_id,
+            regional_score_id,
+            name,
+            grid_indicator_score,
+            grid_pop_score,
+            grid_peer_score,
+            grid_resource_score,
+            grid_traffic_score,
+            grid_road_score
+        FROM tb_regional_score_grid
+        WHERE regional_score_id = #{regionalScoreId}
+        <if test="pointIds != null and pointIds.size() > 0">
+            AND grid_id IN
+            <foreach collection="pointIds" item="pointId" open="(" separator="," close=")">
+                #{pointId}
+            </foreach>
+        </if>
+    </select>
+
+</mapper>
